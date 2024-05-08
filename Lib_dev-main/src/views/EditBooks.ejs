@@ -1,0 +1,46 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Book</title>
+    <link href="/css/Listform.css" type="text/css" rel="stylesheet">
+    <link href="/css/NavigationBar.css " type="text/css" rel="stylesheet">
+
+</head>
+<body>
+    <div class="topnav">
+        <a class="active" href="/Home">Home</a>
+        <a href="/Home/Addbooks">Add Book</a>
+        <a href="/search">Find Books</a>
+        <a href="#about">Account</a>
+        <a href="/Cus_Show">Customer List</a>
+        <a href="/Book_show">Book List</a>
+        <a href="/NewPaper">Find Name</a>
+        
+      </div>
+    <form action="/Updatebook" method="POST">
+
+        
+        <input type="hidden" id="Book_id" name="Book_id" value="<%= GetBookdINFO.Book_id %>">
+        
+
+        <label for="title">title</label>
+        
+        <input type="text" id="title" name="title" value="<%= GetBookdINFO.title %>">
+        
+        <label for="author">author</label>
+        <input type="text" id="author" name="author" value="<%= GetBookdINFO.author %>">
+        
+        <label for="parentFolder">parentFolder</label>
+        <input type="text" id="parentFolder" name="parentFolder" value="<%= GetBookdINFO.parentFolder %>">
+        
+        <label for="image">image</label>
+        <input type="file" id="image" name="image" value="<%= GetBookdINFO.image %>">
+        
+        <button type="submit">Update</button>
+    </form>
+</body>
+<body>
+    
+</body>
+</html>

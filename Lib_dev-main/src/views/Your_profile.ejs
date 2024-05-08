@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin người dùng</title>
+    <link href="/css/Listform.css" type="text/css" rel="stylesheet">
+    <link href="/css/NavigationBar.css" type="text/css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="topnav">
+        <a class="active" href="/Home">Trang chủ</a>
+        <a href="/Home/Addbooks">Thêm Sách</a>
+        <a href="/search">Tìm Sách</a>
+        <a href="/Profile">Tài khoản</a>
+        <a href="/Cus_Show">Danh sách Khách hàng</a>
+        <a href="/Book_show">Danh sách Sách</a>
+        <a href="/NewPaper">NewPaper</a>
+        
+    </div>
+
+    <h1>Thông tin người dùng</h1>
+    
+    <% if (profile) { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tên người dùng</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Ngày sinh</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><%= profile.UserName %></td>
+                    <td><%= profile.Gmail %></td>
+                    <td><%= profile.Phone %></td>
+                    <td><%= profile.BirthDay %></td>
+                </tr>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p>Không tìm thấy thông tin người dùng.</p>
+    <% } %>
+
+</body>
+
+</html>

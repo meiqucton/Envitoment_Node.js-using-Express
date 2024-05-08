@@ -1,0 +1,24 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/Weathers.css" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+</head>
+<body>
+    <div class="weather-container">
+        <div>
+            <i class="fas fa-thermometer-half"></i> <%= apiWeather.main.temp %> °C
+        </div>
+        <div>
+            <i class="fas fa-wind"></i> <%= apiWeather.wind.speed %> m/s
+        </div>
+        <div>
+            <i class="fas fa-cloud"></i> <%= apiWeather.clouds.all %>%
+        </div>
+    </div>
+    
+</body>
+</html>

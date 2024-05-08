@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/find.css" type="text/css" rel="stylesheet">
+    <title>FindBook</title>
+</head>
+<body>
+    
+    <form action="/FindBook" method="get">
+        <label for="BookTitle">Tiêu đề</label>
+        <input type="text" name="BookTitle" id="BookTitle">
+        <button type="submit">Tìm kiếm</button>
+    </form>
+
+    <div>
+        <% if (Books && Books.BookTitle) { %>
+            <table>
+                <tr>
+                    <td>Id:</td>
+                    <td><%= Books._id %></td>
+                </tr>
+                <tr>
+                    <td>Tiêu đề:</td>
+                    <td><%= Books.BookTitle %></td>
+                </tr>
+                <tr>
+                    <td>Tác giả:</td>
+                    <td><%= Books.Author %></td>
+                </tr>
+                <tr>
+                    <td>Thông tin:</td>
+                    <td><%= Books.About %></td>
+                </tr>
+                <tr>
+                    <td>Năm xuất bản:</td>
+                    <td><%= Books.Year %></td>
+                </tr>
+                <tr>
+                    <td>Địa chỉ:</td>
+                    <td><%= Books.Adress %></td>
+                </tr>
+            </table>
+            <form action="/UpdateBook/<%=Books._id %>" method="GET">
+                <button type="submit">Update</button>
+            </form>           
+            <form action="/DeleteBook/<%=Books._id %>" method="GET"> 
+                <button type="submit">Delete</button>
+            </form>
+            <% }%>
+    </div>
+</body>
+</html>

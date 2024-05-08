@@ -1,0 +1,49 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="/css/Listform.css" type="text/css" rel="stylesheet">
+    <link href="/css/NavigationBar.css " type="text/css" rel="stylesheet">
+
+</head>
+<body>
+  <div class="topnav">
+    <a class="active" href="/Home">Home</a>
+    <a href="/Home/Addbooks">Add Book</a>
+    <a href="/search">Find Books</a>
+    <a href="/Profile">Account</a>
+    <a href="/Cus_Show">Customer List</a>
+    <a href="/Book_show">Book List</a>
+  </div>
+        <table>
+            <thead>
+              <tr>
+                <th>Person Id</th>
+                <th>UserName</th>
+                <th>Gmail</th>
+                <th>Phone</th>
+                <th>Birthday</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% LibCus.forEach(function(customer) { %>
+                <tr>
+                  <td><%= customer.CustomId%></td>
+                  <td><%= customer.UserName%></td>
+                  <td><%= customer.Gmail %></td>
+                  <td><%= customer.Phone %></td>
+                  <td><%= customer.BirthDay %></td>
+                  <a href="/NewPaper">Find Name</a>
+        
+                  <td>
+                    <a href="/Update/<%=customer.CustomId%>"><button>Edit</button></a>
+                    <a href="/Delete/<%=customer.CustomId%>"><button>Delete</button></a>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+        </table>
+</body>
+</html>

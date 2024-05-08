@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete</title>
+    <link rel="stylesheet" href="/css/Del.css" type="text/css" rel="stylesheet">
+    <link href="/css/NavigationBar.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+    <form action="/Delete/<%= GetUser.CustomId %>" method="POST">     
+        <label>Are you sure to delete this Custom </label>
+        <span id="CustomId"><%= GetUser.CustomId %></span>
+
+        <!-- Hidden field to hold the CustomId -->
+        <input type="hidden" name="CustomId" value="<%= GetUser.CustomId %>">
+
+        <label for="UserName">Name</label>
+        <span id="UserName"><%= GetUser.UserName %></span>
+        
+        <label for="Gmail">Gmail</label>
+        <span id="Gmail"><%= GetUser.Gmail %></span>
+        
+        <label for="BirthDay">Birthday</label>
+        <span id="BirthDay"><%= GetUser.BirthDay %></span>
+        
+        <label for="Phone">Phone</label>
+        <span id="Phone"><%= GetUser.Phone %></span>
+        
+        <button type="submit">Delete</button>
+    </form>
+</body>
+</html>

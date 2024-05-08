@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận OTP</title>
+    <!-- Nếu bạn có các file CSS cần áp dụng cho trang này, hãy đặt link ở đây -->
+    <link href="/css/checkOTP.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="container">
+        <h2>Xác nhận OTP</h2>
+        <p>Vui lòng nhập mã OTP đã gửi đến email của bạn để hoàn thành đăng ký.</p>
+        <form action="/checkOTP"  method="POST" >
+            <label for="otp">Mã OTP:</label>
+            <input type="text" id="otp" name="otp" required>
+            <button type="submit">Xác nhận</button>
+        </form>
+    </div>
+</body>
+</html>

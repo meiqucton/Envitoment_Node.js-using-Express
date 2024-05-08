@@ -1,0 +1,58 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/find.css" type="text/css" rel="stylesheet">
+    <link href="/css/NavigationBar.css " type="text/css" rel="stylesheet">
+
+    <title>Serch</title>
+</head>
+<body>
+    <div class="topnav">
+        <a class="active" href="/Home">Home</a>
+        <a href="/Home/Addbooks">Add Book</a>
+        <a href="/search">Find Books</a>
+        <a href="Profile">Account</a>
+        <a href="/Cus_Show">Customer List</a>
+        <a href="/Book_show">Book List</a>
+        <a href="/NewPaper">Find Name</a>
+        
+      </div>
+    <form action="/search" method ="GET">
+        <label for="author">Author:</label>
+        <input type="text" id="author" name="author" placeholder="Enter author name">
+        <button type="submit">Search</button>
+    </form>
+    <% if (results && results.length > 0) { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Author</th>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% results.forEach(function(result) { %>
+                    <tr>
+                  
+  
+                        <td><%= result.author %></td>
+                        <td>
+                            <img src="<%= result.image %>" alt="Book Image">
+                        </td>
+                        <td><%= result.title %></td>
+                        <td>
+                            <a href="/Comment/<%=result.Book_id%>"><button>Comment</button></a>
+                            <button>Show Comment</button>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p>No results found.</p>
+    <% } %>
+</body>
+</html>

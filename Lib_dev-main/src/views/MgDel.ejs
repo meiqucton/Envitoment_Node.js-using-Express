@@ -1,0 +1,50 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/update.css" type="text/css" rel="stylesheet">
+    <link href="/css/notifacation.css " type="text/css" rel="stylesheet">
+
+    <title>Delete book </title>
+</head>
+<body>
+    <h1>Delete Book</h1>
+    <% if (typeof messages !== 'undefined' && messages.error) { %>
+        <div class="notification error-notification">
+            <%= messages.error %>
+        </div>
+    <% } %>
+    <% if (typeof messages !== 'undefined' && messages.success) { %>
+        <div class="notification success-notification">
+            <%= messages.success %>
+        </div>
+    <% } %>
+    <form action = "/DeleteBook/<%=Book_id%>" method ="post">
+            <table>
+ 
+                <tr>
+                    <td>Tiêu đề:</td>
+                    <td><%= BookTitle %></td>
+                </tr>
+                <tr>
+                    <td>Tác giả:</td>
+                    <td><%= Author %></td>
+                </tr>
+                <tr>
+                    <td>Thông tin:</td>
+                    <td><%= About %></td>
+                </tr>
+                <tr>
+                    <td>Năm xuất bản:</td>
+                    <td><%= Year %></td>
+                </tr>
+                <tr>
+                    <td>Địa chỉ:</td>
+                    <td><%= Address %></td>
+                </tr>
+            </table>
+        
+        <button type="submit">Delete</button>
+    </form>
+</body>
+</html>

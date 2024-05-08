@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Article</title>
+    <link href="/css/NewPaper.css" rel="stylesheet">
+</head>
+<body>
+    <div class="article-container">
+        <div class="article-info">
+            <h2><%= apiNewsPaper.items[0].title %></h2>
+            <!-- Displaying snippet (assuming it's stored in apiNewsPaper[0].snippet) -->
+            <p><%= apiNewsPaper.items[0].snippet %></p>
+            <!-- Displaying thumbnail image (assuming it's stored in apiNewsPaper[0].images.thumbnail) -->
+            <img src="<%= apiNewsPaper.items[0].images.thumbnail %>" alt="Thumbnail">
+        </div>
+    </div>
+</body>
+</html>
