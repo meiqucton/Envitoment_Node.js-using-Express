@@ -1,14 +1,13 @@
-const MongoClient = require('../model/Mongodb_User');
+const { checkEmail, register , Login } = require('../model/Mongodb_User');
 const confirmEmail = require('../config/Send_Mail');
 const otpGenerator = require('otp-generator');
 
 let otp; // Khai báo biến otp là biến toàn cục
-const CreateUser = async (req, res) => {
+const createAccount = async (req, res) => {
+    
     const { UserName, Password, Email, BirthDay } = req.body;
     // Generate a 6-digit numeric OTP
-    const otp = otpGenerator.generate(6, { digits: true, alphabets: false, upperCase: false, specialChars: false });
-
-    
+    otp = otpGenerator.generate(6, { digits: true, alphabets: false, upperCase: false, specialChars: false });
 
     try {
         // Check if all required fields are provided
@@ -34,12 +33,12 @@ const CreateUser = async (req, res) => {
         }
 
         // Check if email already exists
-        const emailExists = await MongoClient.checkEmail(Email);
+        const emailExists = await checkEmail(Email);
         if (emailExists) {
             req.flash('error', 'Email đã tồn tại');
             return res.redirect('/');
         }
-       // await MongoClient.createUser({UserName, Password, Email, BirthDay});
+       // await MongoClient.createAccount({UserName, Password, Email, BirthDay});
       await confirmEmail.sendEmail( Email, 'Mã Xác Nhận',
       `<!DOCTYPE html>
       <html lang="en">
@@ -66,21 +65,31 @@ const CreateUser = async (req, res) => {
       </body>
       </html>
       `)    
+      req.session.userData = { UserName, Password, Email, BirthDay }; // Lưu dữ liệu vào session / để dùng cho các biến khác 
       res.redirect('/checkOTP');
+      
     } catch (err) {
         console.log(err);
         req.flash('error', 'Lỗi máy chủ nội bộ khi tạo người dùng');
         return res.status(500).redirect('/');
     }
 };
-const get_OTP = async(req, res, next) =>{
+const get_OTP = async (req, res) => {
     try {
-        const { UserName, Password, Email, BirthDay } = req.body;
-        const { getotp } = req.body;
-        res.render('checkOTP', { getOTP: getotp });
+        const { getOTP } = req.body; // Lấy mã OTP từ form
 
-        if (getotp === otp) {
-            await MongoClient.createUser({ UserName, Password, Email, BirthDay });
+        if (!getOTP) {
+            req.flash('error', 'Vui lòng nhập mã xác nhận');
+            return res.redirect('/checkOTP');
+        }
+
+        // Kiểm tra xem mã OTP nhập vào có khớp với mã đã gửi không
+        if (getOTP === otp) {
+            // Nếu khớp, tạo người dùng
+        const { UserName, Password, Email, BirthDay } = req.session.userData;
+            delete req.session.userData; // Xóa dữ liệu khỏi session sau khi sử dụng
+
+            await register({ UserName, Password, Email, BirthDay });
             console.log(`Người dùng ${UserName} đã được thêm vào hệ thống`);
             req.flash('success', 'Tạo tài khoản thành công');
             return res.redirect('/'); // Chuyển hướng sau khi tạo tài khoản thành công
@@ -93,10 +102,29 @@ const get_OTP = async(req, res, next) =>{
         req.flash('error', 'Lỗi máy chủ nội bộ khi tạo người dùng');
         return res.status(500).redirect('/');
     }
+};
+const logIn  = async(req, res) => {
+        const {Email, Password} = req.body;
+    if(Email && Password){
+        try{
+            const checkLogin = await Login(Email, Password);
+            if(checkLogin){
+                req.flash('success', 'Đăng nhập thành công');
+                return res.redirect('/Home');
+                }
+            else{
+                req.flash('error', 'Đăng nhập thất bại');
+                return res.redirect('/');
+            }
+        }catch(errr){
+            console.log(errr);
+            res.status(500).send('Lỗi máy chủ nội bộ khi đăng nhập');
+        }
+    }
 }
 
 module.exports = {
-    CreateUser,
-    get_OTP
-    
+    createAccount,
+    get_OTP,
+    logIn,
 };
