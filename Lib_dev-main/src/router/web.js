@@ -3,7 +3,7 @@ const router = express.Router();
 const homeController = require('../controllers/authentication');
 const {APIOpenWeather, GoogleNews , Librarys} = require('../controllers/API_Controllers');    
 const { AddBook,get_delete,Del_book,Find_Book_Title,Update_Book, get_update, List_books} = require('../controllers/Mongoo_Product');
-const {createAccount, get_OTP, logIn} = require('../controllers/Mongoo_User');
+const {createAccount, get_OTP, logIn, forgot_Password} = require('../controllers/Mongoo_User');
 const { Library } = require('../config/APIs');
 
 
@@ -15,7 +15,8 @@ router.post('/Signin', logIn)
 router.post('/Signup',createAccount)
 router.get('/checkOTP', (req, res) => res.render('checkOTP'));
 
-
+router.get('/FogotPass', (req, res) => res.render('FogotPass'));
+router.post('/Fogot_Pass',forgot_Password);
 router.get('/Addbook', (req, res) => res.render('MgAdd'));
 router.post('/Addbooks',AddBook);
 

@@ -1,4 +1,4 @@
-const { checkEmail, register , Login } = require('../model/Mongodb_User');
+const { checkEmail, register , Login, forgotPassword } = require('../model/Mongodb_User');
 const confirmEmail = require('../config/Send_Mail');
 const otpGenerator = require('otp-generator');
 
@@ -129,8 +129,57 @@ const logIn = async (req, res) => {
       return res.status(500).redirect('/');
     }
   };
+const forgot_Password = async (req, res) => {
+    const { Email } = req.body;
+    if(!Email){
+        req.flash('error', 'Vui lòng Nhập Email');
+        return res.redirect('/forgotPass');
+    }
+    try{
+        const Forgot = await forgotPassword(Email);
+        if(Forgot){
+            const { UserName, Password} = Forgot;
+            req.flash('success', 'thông tin tài khoản đã được gửi đến mail của bạn ');
+            await confirmEmail.sendEmail( Email, 'Quên Mật khẩu',
+            `<!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Xác nhận đăng ký tài khoản</title>
+                <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+                <link href="/css/mailOTP.css" type="text/css" rel="stylesheet">
+            </head>
+            <body>
+            <div class="container">
+                <h2>Đây là Password Shop Dev của bạn</h2>
+                <ul>
+                    <li>
+                        <strong>Username:</strong> ${UserName}
+                    </li>
+                    <li>
+                        <strong>Pass:</strong> ${Password}
+                    </li>
+                </ul>
+            </div>
+            </body>
+            </html>
+            `)    
+            res.redirect('/')
+        }else{
+            req.flash('error', 'Email không tồn tại');
+            return res.redirect('/forgotPass');
+        }
+    }
+    catch(err){
+        console.log(err);
+        req.flash('error', 'Lỗi máy chủ nội phía Forgot pass');
+        return res.status(500).redirect('/');
+    }
+}
 module.exports = {
     createAccount,
     get_OTP,
     logIn,
+    forgot_Password,
 };

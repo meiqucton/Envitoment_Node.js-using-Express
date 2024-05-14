@@ -34,8 +34,19 @@ const Login = async (Email, Password) => {
         return false;
     }
   };
+const forgotPassword = async (Email) => {
+    await client.connect();
+    try{
+        return await client.db(process.env.NAME_DATABASE).collection('User').findOne({Email: Email});
+    }
+    catch(err){
+        console.log("Lỗi forgotPassword", err);
+        return false;
+    }
+}
 module.exports = {
     register,
     checkEmail,
     Login,
+    forgotPassword,
 };
