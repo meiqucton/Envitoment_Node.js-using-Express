@@ -1,8 +1,11 @@
-const client = require('../config/Mongoo_DB');
 require('dotenv').config();
+const client = require('../config/Mongoo_DB');
+const bcrypt = require('bcrypt');
  
 const register = async(Account) =>  {
+    
     try{
+    await client.connect();
     const New_User = await client.db(process.env.NAME_DATABASE).collection("User").insertOne(Account);
     return New_User.insertedId;
     }catch(err){
@@ -12,6 +15,8 @@ const register = async(Account) =>  {
 
 }
 const checkEmail = async(Email) => {
+    await client.connect();
+
     try{
     return await client.db(process.env.NAME_DATABASE).collection("User").findOne({ Email: Email });
     }
@@ -20,25 +25,15 @@ const checkEmail = async(Email) => {
         return false;
     }
 }
-const Login = async(Email, Password) => {
+const Login = async (Email, Password) => {
+    await client.connect();
     try{
-        const user = await client.db(process.env.NAME_DATABASE).collection("User").findOne({Email : Email});
-        if(!user){
-        //Không timg thấy ngừoi Dùng
-        return false;
-        }
-        const checkPass = await comparePassword(Password, user.Password);
-        if(!checkPass){
-        // Mật khẩu của tai khoản không đúng 
-        return false;
-        }
-        return user;
-    }
-    catch(err){
+        return await client.db(process.env.NAME_DATABASE).collection('User').findOne({Email: Email, Password: Password});
+    }catch(err){
         console.log("Lỗi Login", err);
         return false;
     }
-}
+  };
 module.exports = {
     register,
     checkEmail,

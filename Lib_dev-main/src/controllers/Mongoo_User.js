@@ -2,6 +2,7 @@ const { checkEmail, register , Login } = require('../model/Mongodb_User');
 const confirmEmail = require('../config/Send_Mail');
 const otpGenerator = require('otp-generator');
 
+
 let otp; // Khai báo biến otp là biến toàn cục
 const createAccount = async (req, res) => {
     
@@ -33,6 +34,7 @@ const createAccount = async (req, res) => {
         }
 
         // Check if email already exists
+        
         const emailExists = await checkEmail(Email);
         if (emailExists) {
             req.flash('error', 'Email đã tồn tại');
@@ -103,26 +105,30 @@ const get_OTP = async (req, res) => {
         return res.status(500).redirect('/');
     }
 };
-const logIn  = async(req, res) => {
-        const {Email, Password} = req.body;
-    if(Email && Password){
-        try{
-            const checkLogin = await Login(Email, Password);
-            if(checkLogin){
-                req.flash('success', 'Đăng nhập thành công');
-                return res.redirect('/Home');
-                }
-            else{
-                req.flash('error', 'Đăng nhập thất bại');
-                return res.redirect('/');
-            }
-        }catch(errr){
-            console.log(errr);
-            res.status(500).send('Lỗi máy chủ nội bộ khi đăng nhập');
-        }
+const logIn = async (req, res) => {
+    const { Email, Password } = req.body;
+  
+    if (!Email || !Password) {
+      req.flash('error', 'Vui lòng nhập đầy đủ thông tin');
+      return res.redirect('/');
     }
-}
-
+  
+    try {
+      const checkLogin = await Login(Email, Password);
+  
+      if (checkLogin) {
+        req.flash('success', 'Đăng nhập thành công');
+        res.render('Home');
+      } else {
+        req.flash('error', 'Tài khoản không tồn tại hoặc mật khẩu không đúng');
+        return res.redirect('/');
+      }
+    } catch (err) {
+      console.log(err);
+      req.flash('error', 'Lỗi máy chủ nội bộ khi đăng nhập');
+      return res.status(500).redirect('/');
+    }
+  };
 module.exports = {
     createAccount,
     get_OTP,
