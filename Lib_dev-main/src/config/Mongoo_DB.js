@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, GridFSBucket} = require('mongodb');
 const uri = process.env.DB_MONGOODB;
 
 // Create a MongoClient with specific options
@@ -9,14 +9,6 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
-async function run() {
-  try {
-    await client.connect();
-    await client.db("admin").command({ ping: 1 });
-    console.log("Kết nối Mongoodb thành công!");
-  } finally {
-    await client.close();
-  }
-}
-run();
+
+
 module.exports = client;

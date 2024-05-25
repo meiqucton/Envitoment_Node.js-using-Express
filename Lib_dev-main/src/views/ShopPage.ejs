@@ -1,0 +1,65 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop</title>
+    <link href="css/navagativeBarmini.css" type="text/css" rel="stylesheet">
+    <link href="/css/ShopPage.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+       <!-- Header -->
+       <header>
+        <div class="container">
+            <h1>TonShop</h1>
+            <nav>
+                <ul>
+                    <input type = 'text' ></input>  
+                    <li><a href="#">Trang Chủ</a></li>
+                    <li><a href="#">Sản Phẩm</a></li>
+                    <li><a href="#">Liên Hệ</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <!-- Banner -->
+            <section class="banner">
+                <div class="banner-inner">
+                    <img src="https://i.pinimg.com/564x/f4/8b/e8/f48be8b2ae9d1c3d2b783173076beee7.jpg">
+                    <img src="https://i.pinimg.com/564x/60/94/de/6094de00abc227b646f91d5ee32fdc2d.jpg">
+                    <img src="https://i.pinimg.com/474x/1a/43/27/1a4327b1455bb789bc0c2b00a601fb93.jpg">
+               
+                </div>
+            </section>
+            
+            
+
+            <!-- Product Section -->
+            <section class="products">
+                <h2>Sản Phẩm Mới Nhất</h2>
+                <div class="product-list">
+                    <% productList.forEach(product => { %>
+                    <div class="product">
+                        <img src="<%= product.image %>" alt="<%= product.name %>">
+                        <h3><%= product.name %></h3>
+                        <p><%= product.price %> VND</p>
+                        <button>Thêm vào giỏ</button>
+                    </div>
+                    <% }); %>
+                </div>
+            </section>
+            
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Shop. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

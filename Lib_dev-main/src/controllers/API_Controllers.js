@@ -1,38 +1,30 @@
-const axios = require('axios');
-const {APIOpenWeather, NewsPaper, Library} = require('../config/APIs');
+require('dotenv').config();
+const { APIOpenWeather } = require('../config/APIs');
 
-const OpenWeather = async(req, res, next) => {
-    try{
-       const respond = await axios.request(APIOpenWeather);
-       const apiWeather = respond.data;
-       res.render('OpenWeather', {apiWeather});
-    }catch(err){
-        console.log(err);
-        res.status(500).send('Lỗi máy chủ nội bộ');
-        console.log('SHoww err', err);
+const OpenWeather = async (req, res, next) => {
+    const apiweather = process.env.API_KEY_WEATHER;
+    const city = req.body.city;
+    var currentDate = new Date();    
+
+    if (!city) {
+        req.flash('error', 'Vui lòng nhập tên thành phố');
+        return res.redirect('/');
     }
 
-}
-const GoogleNews = async(req, res, next) => {
-    try{
-       const respond = await axios.request(NewsPaper);
-       const apiNewsPaper = respond.data;
-       res.render('NewsPaper', {apiNewsPaper});
-    }catch(err){
-        console.log(err);
-        res.status(500).send('Lỗi máy chủ nội bộ');
-        console.log('SHoww err', err);
+    try {
+        const theWeather = await APIOpenWeather(city, apiweather);
+        var formattedDate = currentDate.getDate() + '/' + (currentDate.getMonth() + 1) + '/' + currentDate.getFullYear();
+
+        if (!theWeather || theWeather.cod === 404) {
+            req.flash('error', 'Không tìm thấy thông tin cho thành phố này');
+            return res.redirect('/pageWeather');
+        } else {
+            res.render('searchWeather', { theWeather, formattedDate });
+        }
+    } catch (err) {
+        console.error('Error calling API OpenWeather:', err);
+        res.status(500).send('Lỗi máy chủ nội bộ của OpenWeather');
     }
 }
-const Librarys = async(req, res, next) => {
-    try{
-       const respond = await axios.request(Library);
-       const book = respond.data;
-       res.render('Library', {book});
-    }catch(err){
-        console.log(err);
-        res.status(500).send('Lỗi máy chủ nội bộ');
-        console.log('SHoww err', err);
-    }
-}
-module.exports = {OpenWeather, GoogleNews, Librarys};
+
+module.exports = { OpenWeather };

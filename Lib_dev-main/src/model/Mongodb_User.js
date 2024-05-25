@@ -1,6 +1,6 @@
 require('dotenv').config();
 const client = require('../config/Mongoo_DB');
-const bcrypt = require('bcrypt');
+
  
 const register = async(Account) =>  {
     

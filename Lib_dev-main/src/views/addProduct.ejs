@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <link href="/css/AddProduct.css" type="text/css" rel="stylesheet">
+    <link href="/css/notifacation.css " type="text/css" rel="stylesheet">
+    <link href="/css/navagativeBarmini.css" type="text/css" rel="stylesheet">
+
+
+</head>
+<body>
+    <% if (typeof messages !== 'undefined' && messages.error) { %>
+        <div class="notification error-notification">
+            <%= messages.error %>
+        </div>
+    <% } %>
+    <% if (typeof messages !== 'undefined' && messages.success) { %>
+        <div class="notification success-notification">
+            <%= messages.success %>
+        </div>
+    <% } %>
+    
+    <div class="container">
+        <div class="child">
+            <h1>Add Product</h1>
+            <form action="/addProduct" method="POST" >
+                <input type="text" name="name" placeholder="name" required>
+                <input type="number" name="price" placeholder="price" required>
+                <select name="type" id="itemtype" required>
+                    <option value="shirt">shirt</option>
+                    <option value="coat">coat</option>
+                    <option value="pants">pants</option>
+                    <option value="hat">hat</option>
+                    <option value="watch">watch</option>
+                    <option value="shoes">shoes</option>
+                    <option value="bag">bag</option>
+                    <option value="outfit">outfit</option>
+                    <option value="dress">dress</option>
+                    <input type="file" name="image" accept="image/*" required> 
+                </select>
+                <button type="submit">Add Product</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

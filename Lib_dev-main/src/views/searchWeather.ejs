@@ -1,0 +1,31 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/resultWeather.css">
+    <link rel="stylesheet" href="/css/Forn_text.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="/css/navagativeBarmini.css" type="text/css" rel="stylesheet">
+
+
+    <title>Weather</title>
+</head>
+<body>
+    
+    <% if (theWeather && theWeather.name ) { %>
+        <div class="container">
+            
+            <div class="weather">
+               <p> <%= theWeather.name %> </p>
+                
+              </div>
+            <p><i class="fa-solid fa-calendar-days"></i><%= formattedDate %></p>
+            <p><i class="fa-solid fa-umbrella" style="color: #ffffff;" ></i> : <%= theWeather.weather[0].main %></p>
+            <p><i class="fa-solid fa-temperature-three-quarters" style="color: #ffffff;"></i> : <%= (theWeather.main.temp - 273.15).toFixed(2) %>°C</p>
+            <p><i class="fa-solid fa-cloud" style="color: #ffffff;"></i> : <%= theWeather.clouds.all %>%</p>
+        </div>
+    <% } else { %>
+        <p>No weather data available for this city.</p>
+    <% } %>
+</body>
+</html>

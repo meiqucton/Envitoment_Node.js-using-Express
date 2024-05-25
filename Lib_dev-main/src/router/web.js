@@ -1,39 +1,34 @@
 const express = require('express');
 const router = express.Router();
+
 const homeController = require('../controllers/authentication');
-const {APIOpenWeather, GoogleNews , Librarys} = require('../controllers/API_Controllers');    
-const { AddBook,get_delete,Del_book,Find_Book_Title,Update_Book, get_update, List_books} = require('../controllers/Mongoo_Product');
-const {createAccount, get_OTP, logIn, forgot_Password} = require('../controllers/Mongoo_User');
-const { Library } = require('../config/APIs');
+const { OpenWeather } = require('../controllers/API_Controllers');
+const { createAccount, get_OTP, logIn, forgot_Password } = require('../controllers/Mongoo_User');
+const { listProducts, AddProducts } = require('../controllers/Mongoo_Product');
 
+// Import biến upload từ Multer
 
-// Define routes
 router.get('/', (req, res) => res.render('Oripage'));
 router.get('/Home', homeController.showHome);
 
-router.post('/Signin', logIn)
-router.post('/Signup',createAccount)
+router.post('/Signin', logIn);
+router.post('/Signup', createAccount);
+
 router.get('/checkOTP', (req, res) => res.render('checkOTP'));
+router.post('/checkOTP', get_OTP);
 
 router.get('/FogotPass', (req, res) => res.render('FogotPass'));
-router.post('/Fogot_Pass',forgot_Password);
-router.get('/Addbook', (req, res) => res.render('MgAdd'));
-router.post('/Addbooks',AddBook);
+router.post('/Fogot_Pass', forgot_Password);
 
-router.get('/FindBook',Find_Book_Title)
+router.get('/pageWeather', (req, res) => res.render('weatherView'));
+router.post('/Weather', OpenWeather);
 
-router.get('/UpdateBook/:_id',get_update);
-router.post('/book/:_id',Update_Book)
+router.get('/addProduct', (req, res) => res.render('addProduct'));
+router.post('/addProduct', AddProducts);
 
-router.get('/DeleteBook/:_id',get_delete);
-router.post('/DeleteBook/:_id',Del_book)
+router.get('/Shop', listProducts);
+router.get('/Shop', (req, res) => res.render('ShopPage'));
 
-//router.get('/checkOTP',(req,res) => res.render('checkOTP'));
-router.post('/checkOTP',get_OTP )
-router.get('/Library', List_books);
-
-
-router.get('/libraryapi', Librarys)
-
+router.get('/Test', (req, res) => res.render('test'));
 
 module.exports = router;

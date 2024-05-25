@@ -117,7 +117,6 @@ const logIn = async (req, res) => {
       const checkLogin = await Login(Email, Password);
   
       if (checkLogin) {
-        req.flash('success', 'Đăng nhập thành công');
         res.render('Home');
       } else {
         req.flash('error', 'Tài khoản không tồn tại hoặc mật khẩu không đúng');
@@ -168,7 +167,7 @@ const forgot_Password = async (req, res) => {
             res.redirect('/')
         }else{
             req.flash('error', 'Email không tồn tại');
-            return res.redirect('/forgotPass');
+            return res.redirect('/FogotPass');
         }
     }
     catch(err){
