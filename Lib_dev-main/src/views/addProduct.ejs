@@ -7,6 +7,8 @@
     <link href="/css/AddProduct.css" type="text/css" rel="stylesheet">
     <link href="/css/notifacation.css " type="text/css" rel="stylesheet">
     <link href="/css/navagativeBarmini.css" type="text/css" rel="stylesheet">
+    <link href="/css/Farme.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 
 </head>
@@ -23,6 +25,7 @@
     <% } %>
     
     <div class="container">
+   
         <div class="child">
             <h1>Add Product</h1>
             <form action="/addProduct" method="POST" >
@@ -39,8 +42,10 @@
                     <option value="outfit">outfit</option>
                     <option value="dress">dress</option>
                     <input type="file" name="image" accept="image/*" required> 
+
                 </select>
-                <button type="submit">Add Product</button>
+                    <textarea class="description-box"  type="text" name="describe" placeholder="describe" required></textarea>
+                <button type="submit"><i class="fa-solid fa-plus"></i></button>
             </form>
         </div>
     </div>

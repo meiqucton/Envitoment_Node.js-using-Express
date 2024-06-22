@@ -13,10 +13,31 @@
             <h1>TonShop</h1>
             <nav>
                 <ul>
-                    <input type = 'text' ></input>  
                     <li><a href="#">Trang Chủ</a></li>
                     <li><a href="#">Sản Phẩm</a></li>
                     <li><a href="#">Liên Hệ</a></li>
+                    <form action="/products" method="get">
+                        <select name="products" id="products" onchange="redirectToProduct()">
+                            <option value="shirt">shirt</option>
+                            <option value="coat">coat</option>
+                            <option value="pants">pants</option>
+                            <option value="hat">hat</option>
+                            <option value="watch">watch</option>
+                            <option value="shoes">shoes</option>
+                            <option value="bag">bag</option>
+                            <option value="outfit">outfit</option>
+                            <option value="dress">dress</option>
+                        </select>
+                    </form>
+
+                    <script>
+                        function redirectToProduct() {
+                            var selectedType = document.getElementById("products").value;
+                            window.location.href = "/products/" + selectedType; 
+                            
+                        }
+                    </script>
+                    
                 </ul>
             </nav>
         </div>
@@ -46,12 +67,15 @@
                         <img src="<%= product.image %>" alt="<%= product.name %>">
                         <h3><%= product.name %></h3>
                         <p><%= product.price %> VND</p>
-                        <button>Thêm vào giỏ</button>
+                        <form action="/theProduct/<%=product._id%>" method="get">
+                            <button type="submit">Thông tin sản phẩm</button>
+                        </form>
                     </div>
                     <% }); %>
                 </div>
             </section>
-            
+      
+        
         </div>
     </main>
 

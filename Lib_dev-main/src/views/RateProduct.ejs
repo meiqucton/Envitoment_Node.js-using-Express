@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Product</title>
+    <link href="/css/rate.css" type="text/css" rel="stylesheet">
+    <link href="/css/notifacation.css " type="text/css" rel="stylesheet">   
+
+</head>
+<body>
+    <% if (typeof messages !== 'undefined' && messages.error) { %>
+        <div class="notification error-notification">
+            <%= messages.error %>
+        </div>
+    <% } %>
+    <% if (typeof messages !== 'undefined' && messages.success) { %>
+        <div class="notification success-notification">
+            <%= messages.success %>
+        </div>
+    <% } %>
+    <div class="product-container">
+        <div class="main-image">
+            <img src="<%= image %>" alt="<%= name %>">
+        </div>
+        <div class="product-details">
+            <h1 class="product-title"><%= name %></h1>
+            <form action="/Product/Rate/<%= _id %>" method="post">
+                <input type="number" id="rate" name="rate" min="0" max="5" required>
+                <textarea type="text" name="comments" placeholder="comments" required></textarea>
+                <button type="submit" class="command-to-cart-button">Rate</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

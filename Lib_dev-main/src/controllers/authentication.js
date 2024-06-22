@@ -1,11 +1,13 @@
-const homeController = {
-    showHome: (req, res) => {
-      if (req.session.loggedin) {
-        res.render(`Home`);
-      } else {
-        res.render('Oripage');
-      }
-    },
-  };
+
+const requireLogin = (req, res, next) => {
+  if (!req.session.userData) {
+    res.redirect('/'); 
+
+  } else {
+      return next();
+
+  }
+};
+
   
-  module.exports = homeController;
+  module.exports = { requireLogin };

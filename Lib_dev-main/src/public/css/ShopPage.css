@@ -6,12 +6,23 @@
     padding: 0;
     box-sizing: border-box;
 }
-
+.Title {
+    font-size:42px;
+    color: #000000;
+    line-height: 1.5;
+    align-items: center;
+}
 /* Cơ bản */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     color: #333;
+}
+.h{
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+
 }
 
 .container {
