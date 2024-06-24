@@ -5,6 +5,7 @@ const { requireLogin } = require('../controllers/authentication');
 const { OpenWeather } = require('../controllers/API_Controllers');
 const { createAccount, get_OTP, logIn, forgot_Password, profileUser } = require('../controllers/Mongoo_User');
 const { listProducts, AddProducts, findTypes, in4_Products, rateTheProduct, getRate, wareHouses, Del_products, get_a_Product, Update_products} = require('../controllers/Mongoo_Product');
+const { buy_function, get_buy} = require('../controllers/Mongoo_Oder');
 
 // Import biến upload từ Multer
 const multer = require('multer');
@@ -52,7 +53,9 @@ router.get('/wareHouses',wareHouses );
 router.get('/yourStore', requireLogin, (req, res) => res.render('yourStore'));
 router.get('/Shop', requireLogin, listProducts);
 router.get('/Shop', requireLogin, (req, res) => res.render('ShopPage'));
-
+//Customer Routes
+router.post('/buyProduct/:_id',requireLogin, buy_function);
+router.get('/Product/Buy/:_id',requireLogin, get_buy);
 // Product function 
 router.get('/updateProduct/:_id', requireLogin, get_a_Product);
 router.get('/Product/Rate/:_id', requireLogin, getRate);

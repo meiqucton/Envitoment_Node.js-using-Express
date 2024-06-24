@@ -149,5 +149,5 @@ module.exports = {
     wareHouse,
     Del_product,
     Update_product,
-    get_Product
+    get_Product,
 };

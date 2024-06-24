@@ -4,7 +4,7 @@ const { Readable } = require('stream');
 
 
 const AddProducts = async (req, res, next) => {
-            const { name, price, type,image, describe} = req.body;
+            const { name, price, type,image, describe, quanlity} = req.body;
     //const image = req.file;
     try {
         const userId = req.session.userData._id;
@@ -14,7 +14,7 @@ const AddProducts = async (req, res, next) => {
             return res.status(401).redirect('/Error'); 
         }
 
-        if (!name || !price || !image || !type || !describe) {
+        if (!name || !price || !image || !type || !describe || !quanlity) {
                 req.flash('error', 'lỗi không nhận dữ liệu ');
                     return res.redirect('/addProduct');
             }
@@ -22,7 +22,7 @@ const AddProducts = async (req, res, next) => {
                 req.flash('error', 'Giá sản phẩm phải lớn hơn 0');
                 return res.redirect('/addProduct');
             }
-            const theProducts = {name, price, image, type, describe, userName, userId}
+            const theProducts = {name, price, image, type, describe, userName, userId, quanlity}
 
             const newProduct = await AddProduct(theProducts);
             if(newProduct)
@@ -84,6 +84,7 @@ const in4_Products = async (req, res) => {
             avgRate: product.averageRating,
             userName: product.userName,
             comments: product.comments,
+            quanlity: product.quanlity,
         });
     } catch (err) {
         console.log("Lỗi in4_Product(Controller): ", err);
@@ -185,13 +186,13 @@ const Del_products = async (req, res) => {
 const Update_products = async (req, res) => {
     const { _id } = req.params; // Corrected the destructuring
     const user_Id = req.session.userData._id;
-    const { name, price, describe} = req.body;
+    const { name, price, describe, quanlity} = req.body;
 
     try {
         if (!user_Id) {
             return res.status(401).redirect('/Error');
         }
-        const in4_Product = {name, price, describe};
+        const in4_Product = {name, price, describe, quanlity};
         const productUpdated = await Update_product(_id, in4_Product);
         if (productUpdated) {
             req.flash('success', 'Sản phẩm đã được cập nhật');
@@ -223,6 +224,7 @@ const get_a_Product = async (req, res) => {
             name: product.name,
             price: product.price,
             //image: product.image,
+            quanlity: product.quanlity,
             type: product.type,
             describe: product.describe,
         });

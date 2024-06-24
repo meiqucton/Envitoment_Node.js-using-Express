@@ -31,9 +31,10 @@
                             <p>Price: <%= warehouse.price %></p>
                             <img src="<%= warehouse.image %>" alt="Warehouse Image">
                             <p>Type: <%= warehouse.type %></p>
+                            <p> quanlity: (<%= warehouse.quanlity %>)</p>
                             <p>Description: <%= warehouse.describe %></p>
                             <p>Average Rating: <%= warehouse.averageRating %></p>
-                            <p>Shop Name: <%= warehouse.nameshop %></p>
+                            <p>Shop Name: <%= warehouse.userName %></p>
                             <div class="button-function">
                                 <form action="/updateProduct/<%=warehouse._id%>" method="get">
                                     <button type="submit" class="update-button">Update</button>

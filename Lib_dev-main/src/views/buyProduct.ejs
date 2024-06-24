@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mua Hàng</title>
+    <link rel="stylesheet" href="/css/buyCSS.css">
+</head>
+<body>
+    <div class="container">
+        <form action="/buyProduct/<%= _id %>" method="post">
+            <h1>Mua Hàng</h1>
+            <div class="product-info">
+                <div class="product-field">
+                    <label for="product-name">Product Name: </label>
+                    <input type="text" id="product-name" value="<%= name %>" readonly>
+                    <!-- Trường ẩn để lưu giá trị product_name -->
+                    <input type="hidden" name="product_name" value="<%= name %>">
+                </div>
+                <div class="product-field">
+                    <label for="product-quantity">Số lượng:</label>
+                    <input type="number" name="aquality" placeholder="Số lượng" required>
+                </div>
+                <div class="product-field">
+                    <label for="product-size">Kích cỡ:</label>
+                    <select name="size" id="size" required>
+                        <option value="S">S</option>
+                        <option value="M">M</option>
+                        <option value="L">L</option>
+                        <option value="XL">XL</option>
+                        <option value="XXL">XXL</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit">Mua ngay</button>
+        </form>
+    </div>
+
+    <script src="/js/buyFunction.js"></script>
+</body>
+</html>
