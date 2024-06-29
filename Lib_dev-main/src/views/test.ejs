@@ -1,57 +1,69 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../css/Weather.css">
-    <link href="/css/notifacation.css " type="text/css" rel="stylesheet">
-    <link href="/css/notifacation.css " type="text/css" rel="stylesheet">   
-    <link href="/css/navagativeBarmini.css" type="text/css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Address</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .address-card {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
 <body>
-  <body>
-    <nav>
-      
-      <div class="navbar">
-        <div class="container nav-container">
-            <input class="checkbox" type="checkbox" name="" id="" />
-            <div class="hamburger-lines">
-              <span class="line line1"></span>
-              <span class="line line2"></span>
-              <span class="line line3"></span>
-            </div>  
-          <div class="logo">
-            <h1>Navbar</h1>
-          </div>
-          <div class="menu-items">
-            <li><a href="/Signin">Home</a></li>
-            <li><a href="#">about</a></li>
-            <li><a href="#">blogs</a></li>
-            <li><a href="#">portfolio</a></li>
-            <li><a href="#">contact</a></li>
-          </div>
-        </div>
-      </div>
-    </nav>
-    <div class="container">
-      <h1>Weather Report</h1>
+  <h1>User Address</h1>
+  <div id="addressContainer"></div>
 
-      <% if (typeof messages !== 'undefined' && messages.error) { %>
-          <div class="notification error-notification">
-              <%= messages.error %>
-          </div>
-      <% } %>
-      <% if (typeof messages !== 'undefined' && messages.error) { %>
-          <div class="notification error-notification">
-              <%= messages.error %>
-          </div>
-      <% } %>
-      <form action="/Weather" method="post" class="theWeather-form">
-          <label for="city">Enter City Name:</label>
-          <input type="text" id="city" name="city" required>
-          <button type="submit">Get Weather</button>
-      </form>
-  </div>
-  </body>
+  <script>
+    function fetchUserAddress(userId) {
+      fetch(`http://localhost:3000/get_user_address?user_id=${userId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            displayError(data.error);
+          } else {
+            displayAddress(data);
+          }
+        })
+        .catch(error => {
+          displayError('Error fetching address. Please try again later.');
+          console.error('Error:', error);
+        });
+    }
+
+    function displayAddress(address) {
+      const addressContainer = document.getElementById('addressContainer');
+      addressContainer.innerHTML = `
+        <div class="address-card">
+          <h3>User Address</h3>
+          <p><strong>Address Line 1:</strong> ${address.address_line1}</p>
+          <p><strong>Address Line 2:</strong> ${address.address_line2 || '-'}</p>
+          <p><strong>City:</strong> ${address.city}</p>
+          <p><strong>State:</strong> ${address.state}</p>
+          <p><strong>Postal Code:</strong> ${address.postal_code}</p>
+          <p><strong>Country:</strong> ${address.country}</p>
+        </div>
+      `;
+    }
+
+    function displayError(message) {
+      const addressContainer = document.getElementById('addressContainer');
+      addressContainer.innerHTML = `<p class="error">${message}</p>`;
+    }
+
+    // Call fetchUserAddress with a specific user ID
+    fetchUserAddress(1); // Replace 1 with the user ID you want to fetch
+
+  </script>
 </body>
 </html>

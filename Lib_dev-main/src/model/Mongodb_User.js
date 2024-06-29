@@ -57,6 +57,30 @@ const in4User = async (user_Id) => {
         return false;
     }
 }
+const updateAdress = async (userId , country, city, conscious, stressName, phoneNumber )  => {
+    await client.connect();
+    try{
+        const user_Id = new ObjectId(userId);
+        const updatedUser = await client.db(process.env.NAME_DATABASE).collection('User').updateOne(
+            {_id: user_Id}, {
+            $push: {
+                address: {
+                    country,
+                    city,
+                    conscious,
+                    stressName,
+                    phoneNumber,
+                }
+            },
+        });
+        return updatedUser.matchedCount > 0;
+    }
+    catch(err){
+        console.log("L��i updateAdress", err);
+        return false;
+    }
+
+}
 
 
 module.exports = {
@@ -65,4 +89,5 @@ module.exports = {
     Login,
     forgotPassword,
     in4User,
+    updateAdress,
 };

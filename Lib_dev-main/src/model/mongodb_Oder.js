@@ -2,7 +2,7 @@ require('dotenv').config();
 const client = require('../config/Mongoo_DB');
 const { ObjectId } = require('mongodb');
 
-const buy_Product = async (Product_id, id_user, name_user, product_name, size, theQuanlity, res) => {
+const buy_Product = async (Product_id, id_user, name_user, product_name, size, theQuanlity, Address) => {
     try {
         const db = client.db(process.env.NAME_DATABASE);
         const productId = new ObjectId(Product_id);
@@ -18,7 +18,7 @@ const buy_Product = async (Product_id, id_user, name_user, product_name, size, t
         }
 
         const newQuality = product.quanlity - theQuanlity;
-        await db.collection("Products").updateOne({ _id: productId }, { $set: { quanlity: newQuality } });
+        await db.collection("Products").updateOne({ _id: productId }, { $set: { quanlity: newQuality } });// trừ số luượng sản phẩm 
 
         const newOrder = await db.collection("yourOrder").insertOne({
             Product_id: productId,
@@ -27,6 +27,7 @@ const buy_Product = async (Product_id, id_user, name_user, product_name, size, t
             product_name,
             size,
             quanlity: theQuanlity,
+            Address,
             orderDate: new Date()
         });
 

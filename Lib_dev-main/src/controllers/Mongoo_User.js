@@ -1,4 +1,4 @@
-const { checkEmail, register, Login, forgotPassword, in4User } = require('../model/Mongodb_User');
+const { checkEmail, register, Login, forgotPassword, in4User, updateAdress } = require('../model/Mongodb_User');
 const confirmEmail = require('../config/Send_Mail');
 const otpGenerator = require('otp-generator');
 
@@ -9,20 +9,17 @@ const createAccount = async (req, res) => {
 
     try {
         
-        // Validate input fields
         if (!UserName || !Password || !Email || !BirthDay) {
             req.flash('error', 'Vui lòng nhập đầy đủ thông tin');
             return res.redirect('/');
         }
 
-        // Validate password format
         const passwordFormat = /^(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
         if (!passwordFormat.test(Password)) {
             req.flash('error', 'Mật khẩu không đủ mạnh (ít nhất 8 ký tự, có ít nhất một chữ hoa và một ký tự đặc biệt)');
             return res.redirect('/');
         }
 
-        // Calculate age based on BirthDay
         const currentDate = new Date();
         const dateOfBirthDay = new Date(BirthDay);
         const age = currentDate.getFullYear() - dateOfBirthDay.getFullYear();
@@ -31,17 +28,14 @@ const createAccount = async (req, res) => {
             return res.redirect('/');
         }
 
-        // Check if email already exists
         const emailExists = await checkEmail(Email);
         if (emailExists) {
             req.flash('error', 'Email đã tồn tại');
             return res.redirect('/');
         }
 
-        // Generate OTP
         otp = otpGenerator.generate(6, { digits: true, alphabets: false, upperCase: false, specialChars: false });
 
-        // Send confirmation email with OTP
         await confirmEmail.sendEmail(Email, 'Mã Xác Nhận',
             `<!DOCTYPE html>
             <html lang="en">
@@ -69,7 +63,6 @@ const createAccount = async (req, res) => {
             </html>`
         );
 
-        // Store user data in session for OTP validation
         req.session.userData = { UserName, Password, Email, BirthDay };
         return res.redirect('/checkOTP');
         
@@ -90,13 +83,12 @@ const get_OTP = async (req, res) => {
         }
 
         if (getOTP === otp) {
-            // OTP validation successful, create user
             const { UserName, Password, Email, BirthDay } = req.session.userData;
             delete req.session.userData;
 
             await register({ UserName, Password, Email, BirthDay });
             req.flash('success', 'Tạo tài khoản thành công');
-            return res.redirect('/'); // Redirect to home or login page
+            return res.redirect('/'); 
         } else {
             req.flash('error', 'Mã xác nhận không đúng');
             return res.redirect('/checkOTP');
@@ -183,7 +175,34 @@ const forgot_Password = async (req, res) => {
         return res.status(500).redirect('/');
     }
 };
+const getUser = async (req, res) => {
+    
+    try{
+        const _id = req.session.userData._id;
+        const Name = req.session.userData.UserName;
 
+        const user = await in4User(_id);
+        if(!user){
+            console.log('Không tìm thấy máy chủ của người dùng ở phần Controller(getUser)');
+            return res.status(404).redirect('/Error');
+        }
+        else{
+            res.render('Address', {
+                _id: _id,
+                userName: Name,
+                country: user.countryl,
+                city: user.city,
+                conscious: user.conscious,
+                stressName: user.stressName,
+                phoneNumber: user.phoneNumber
+            });
+        }
+    }catch(err){
+        console.log(err);
+        req.flash('error', 'L��i máy chủ nội bộ khi lấy thông tin người dùng');
+        return res.status(500).redirect('/Error');
+    }
+}
 const profileUser = async (req, res) => {
     try {
 
@@ -208,11 +227,43 @@ const profileUser = async (req, res) => {
         return res.status(500).redirect('/Error');
     }
 };
+const Address = async(req, res) => {
+    const { country, city, conscious, stressName, phoneNumber} = req.body;
+    const _id = req.session.userData._id;
+    const Address = req.session.userData._id;
+    try{
+        if(!_id) {
+            console.log('Không tìm thấy máy chủ của người dùng ở phần Controller(Address)');
+            return res.status(500).redirect('/Error');   
+        }
+        if(Address ){
+
+        }
+        const productUpdated = await updateAdress(_id, country, city, conscious, stressName, phoneNumber,);
+        if(!productUpdated){
+            console.log('Cập nhật thông tin người dùng thất bại');
+            req.flash('Update address is notsuccessfully');
+        }
+        else{
+            console.log('Cập nhật thông tin người dùng thành công');
+            req.flash('Update address successfully');
+            res.redirect('/profile');
+        }
+
+    }catch(err){
+        console.log(err);
+        req.flash('error', 'L��i máy chủ nội bộ khi cập nhật thông tin người dùng');
+        return res.status(500).redirect('/Error');
+    }       
+};
 
 module.exports = {
     createAccount,
-    get_OTP,
+    get_OTP,    
     logIn,
     forgot_Password,
     profileUser,
+    Address,
+    getUser
+
 };

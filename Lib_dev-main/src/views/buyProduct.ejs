@@ -5,8 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mua Hàng</title>
     <link rel="stylesheet" href="/css/buyCSS.css">
+    <link rel="stylesheet" href="/css/notifacation.css">
 </head>
 <body>
+    <% if (typeof messages !== 'undefined' && messages.error) { %>
+        <div class="notification error-notification">
+            <%= messages.error %>
+        </div>
+    <% } %>
+    <% if (typeof messages !== 'undefined' && messages.success) { %>
+        <div class="notification success-notification">
+            <%= messages.success %>
+        </div>
+    <% } %>
     <div class="container">
         <form action="/buyProduct/<%= _id %>" method="post">
             <h1>Mua Hàng</h1>
@@ -14,16 +25,15 @@
                 <div class="product-field">
                     <label for="product-name">Product Name: </label>
                     <input type="text" id="product-name" value="<%= name %>" readonly>
-                    <!-- Trường ẩn để lưu giá trị product_name -->
                     <input type="hidden" name="product_name" value="<%= name %>">
                 </div>
                 <div class="product-field">
                     <label for="product-quantity">Số lượng:</label>
-                    <input type="number" name="aquality" placeholder="Số lượng" required>
+                    <input type="number" name="theQuanlity" id="product-quantity" placeholder="Số lượng" required>
                 </div>
                 <div class="product-field">
                     <label for="product-size">Kích cỡ:</label>
-                    <select name="size" id="size" required>
+                    <select name="size" id="product-size" required>
                         <option value="S">S</option>
                         <option value="M">M</option>
                         <option value="L">L</option>
@@ -31,11 +41,31 @@
                         <option value="XXL">XXL</option>
                     </select>
                 </div>
+                <div class="product-field">
+                    <% if (!Address || Address.length === 0) { %>
+                        <p>Chưa có địa chỉ nào. Vui lòng thêm một địa chỉ!</p>
+                    <% } else { %>
+                        <div class="address-list">
+                            <% Address.forEach(function(address, index) { %>
+                                <div class="address">
+                                    <input type="radio" id="address<%= index %>" name="address_index" value="<%= index %>" required>
+                                    <label for="address<%= index %>">
+                                        <i class="fas fa-user"></i>
+                                        <p>Quốc gia: <%= address.country || 'N/A' %></p>
+                                        <p>Thành phố: <%= address.city || 'N/A' %></p>
+                                        <p>Tỉnh: <%= address.conscious || 'N/A' %></p>
+                                        <p>Tên đường: <%= address.stressName || 'N/A' %></p>
+                                        <p>Số điện thoại: <%= address.phoneNumber || 'N/A' %></p>
+                                    </label>
+                                   </div>
+                            <% }); %>
+                        </div>
+                    <% } %>
+                </div>
             </div>
             <button type="submit">Mua ngay</button>
         </form>
     </div>
-
     <script src="/js/buyFunction.js"></script>
 </body>
 </html>

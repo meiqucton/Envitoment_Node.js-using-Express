@@ -1,0 +1,34 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address</title>
+    <link rel="stylesheet" href="/css/Address.css" type="text/css">
+</head>
+<body>
+    <h1> <%= userName %></h1>
+    <form action="/updateAddress/<%= _id %>" method="POST">
+        <div>
+            <label for="country">Country:</label>
+            <input type="text" id="country" name="country" value="<%= country %>" required>
+        </div>
+        <div>
+            <label for="city">City:</label>
+            <input type="text" id="city" name="city" value="<%= city %>" required>
+        </div>
+        <div>
+            <label for="conscious">Conscious:</label>
+            <input type="text" id="conscious" name="conscious" value="<%= conscious %>" required>
+        </div>
+        <div>
+            <label for="stressName"> Home Stress:</label>
+            <input type="text" id="stressName" name="stressName" value="<%= stressName %>" required>
+        </div>
+        <div>
+            <label for="phoneNumber">Phone Number:</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" value="<%= phoneNumber %>" required>
+        </div>
+        <button type="submit">Update Address</button>
+    </form>
+</body>
+</html>

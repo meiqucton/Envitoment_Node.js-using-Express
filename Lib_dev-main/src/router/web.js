@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { requireLogin } = require('../controllers/authentication');
 const { OpenWeather } = require('../controllers/API_Controllers');
-const { createAccount, get_OTP, logIn, forgot_Password, profileUser } = require('../controllers/Mongoo_User');
+const { createAccount, get_OTP, logIn, forgot_Password, profileUser, getUser, Address } = require('../controllers/Mongoo_User');
 const { listProducts, AddProducts, findTypes, in4_Products, rateTheProduct, getRate, wareHouses, Del_products, get_a_Product, Update_products} = require('../controllers/Mongoo_Product');
 const { buy_function, get_buy} = require('../controllers/Mongoo_Oder');
 
@@ -36,7 +36,9 @@ router.get('/FogotPass', (req, res) => res.render('FogotPass'));
 router.post('/Fogot_Pass', requireLogin, forgot_Password);
 
 // Profile Route
+router.get('/addressUser',requireLogin, getUser )
 router.get('/Profile', requireLogin, profileUser);
+router.post('/updateAddress/:_id', requireLogin, Address);
 
 // Weather Route
 router.get('/pageWeather', requireLogin, (req, res) => res.render('weatherView'));
