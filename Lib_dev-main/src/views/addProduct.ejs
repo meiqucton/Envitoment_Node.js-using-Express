@@ -9,8 +9,6 @@
     <link href="/css/navagativeBarmini.css" type="text/css" rel="stylesheet">
     <link href="/css/Farme.css" type="text/css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-
 </head>
 <body>
     <% if (typeof messages !== 'undefined' && messages.error) { %>
@@ -25,10 +23,9 @@
     <% } %>
     
     <div class="container">
-   
         <div class="child">
             <h1>Add Product</h1>
-            <form action="/addProduct" method="POST" >
+            <form action="/addProduct" method="POST" enctype="multipart/form-data">
                 <input type="text" name="name" placeholder="name" required>
                 <input type="number" name="price" placeholder="price" required>
                 <input type="number" name="quanlity" placeholder="quanlity" required>
@@ -42,11 +39,9 @@
                     <option value="bag">bag</option>
                     <option value="outfit">outfit</option>
                     <option value="dress">dress</option>
-                <input type="file" name="image" accept="image/*" required> 
-                
-
                 </select>
-                    <textarea class="description-box"  type="text" name="describe" placeholder="describe" required></textarea>
+                <input type="file" name="image" required>
+                <textarea class="description-box" type="text" name="describe" placeholder="describe" required></textarea>
                 <button type="submit"><i class="fa-solid fa-plus"></i></button>
             </form>
         </div>

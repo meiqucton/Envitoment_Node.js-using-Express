@@ -1,0 +1,45 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+}
+
+.product-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.product-container form {
+    margin-bottom: 20px;
+}
+.addProduct-button, .warehouse-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;     
+}
+.warehouse-button{
+    background-color: #515151;
+}
+.addProduct-button{
+    background-color: #515151;
+}
+.warehouse-button:hover{
+    background-color: rgb(104, 220, 131);
+}
+.addProduct-button:hover{
+    background-color: rgb(229, 107, 82);
+}

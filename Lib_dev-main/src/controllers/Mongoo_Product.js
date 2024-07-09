@@ -1,45 +1,61 @@
-const { AddProduct, listProduct, findType, in4Product, rateProduct, wareHouse, Del_product, Update_product, get_Product} = require('../model/mongodb_Product');
-const { in4User } = require('../model/Mongodb_User');
-const { Readable } = require('stream');
-
+const theProduct = require('../model/Mongodb_Product');
+const fs = require('fs');
+const path = require('path');
 
 const AddProducts = async (req, res, next) => {
-            const { name, price, type,image, describe, quanlity} = req.body;
-    //const image = req.file;
+    const { name, price, type, describe, quanlity } = req.body;
+    const image = req.file; // Lấy file ảnh từ request
+
     try {
         const userId = req.session.userData._id;
-        const userName = req.session.userData.UserName; // lấy tên ngừoi dùng sau khi đã đăng nhập 
+        const userName = req.session.userData.UserName;
 
         if (!userId) {
             return res.status(401).redirect('/Error'); 
         }
 
         if (!name || !price || !image || !type || !describe || !quanlity) {
-                req.flash('error', 'lỗi không nhận dữ liệu ');
-                    return res.redirect('/addProduct');
-            }
-            if(price < 0){
-                req.flash('error', 'Giá sản phẩm phải lớn hơn 0');
-                return res.redirect('/addProduct');
-            }
-            const theProducts = {name, price, image, type, describe, userName, userId, quanlity}
+            req.flash('error', 'Lỗi không nhận dữ liệu ');
+            return res.redirect('/addProduct');
+        }
+        if (price < 0) {
+            req.flash('error', 'Giá sản phẩm phải lớn hơn 0');
+            return res.redirect('/addProduct');
+        }
+        const formattedAmount = price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 
-            const newProduct = await AddProduct(theProducts);
-            if(newProduct)
-                req.flash('success', 'Sản phẩm đã được thêm vào');
-                console.log(`Đã thêm sản phẩm ${name} vào webside`)
-                    return res.redirect('/addProduct');
-    
-    }
-    catch(err){
+        // Đọc file ảnh và chuyển đổi sang dạng Buffer
+        const imageData = fs.readFileSync(image.path);
+
+        const theProducts = { 
+            name, 
+            price: formattedAmount, 
+            type, 
+            describe, 
+            userName, 
+            userId, 
+            quanlity,
+            image: {
+                data: imageData,
+                contentType: image.mimetype
+            }
+        };
+
+        const newProduct = await theProduct.AddProduct(theProducts);
+        if (newProduct) {
+            req.flash('success', 'Sản phẩm đã được thêm vào');
+            console.log(`Đã thêm sản phẩm ${name} vào website`);
+            return res.redirect('/addProduct');
+        }
+
+    } catch (err) {
         console.log("Lỗi addProduct(Controller): ", err);
-        return res.status(401).redirect('/Error'); 
+        return res.status(500).redirect('/Error'); 
     }
-
-}
+};
 const listProducts = async (req, res) => {
     try {
-        const productList = await listProduct(); // Assuming listProduct() returns an array of products
+        const productList = await theProduct.listProduct(); // Assuming listProduct() returns an array of products
         res.render('ShopPage', { productList });
     } catch (err) {
         console.log("Error in listProducts(Controller): ", err);
@@ -49,7 +65,7 @@ const listProducts = async (req, res) => {
 const findTypes = async (req, res) => {
     try {
         const { type } = req.params;
-        const products = await findType(type);
+        const products = await theProduct.findType(type);
       
         if (!products) {
             res.render('typeProduct', { 
@@ -70,7 +86,7 @@ const findTypes = async (req, res) => {
 const in4_Products = async (req, res) => {
     try {
         const _id  = req.params._id;
-        const product = await in4Product(_id);
+        const product = await theProduct.in4Product(_id);
         if (!product) {
             return res.status(404).send("Product not found");
         }
@@ -85,6 +101,7 @@ const in4_Products = async (req, res) => {
             userName: product.userName,
             comments: product.comments,
             quanlity: product.quanlity,
+            userId: product.userId,
         });
     } catch (err) {
         console.log("Lỗi in4_Product(Controller): ", err);
@@ -93,21 +110,38 @@ const in4_Products = async (req, res) => {
 }
 const getRate = async (req, res) => {
     try {
-        const _id  = req.params._id;
-        const product = await in4Product(_id);
+        const _id = req.params._id; 
+        const userId = req.session.userData._id; 
+        const product = await theProduct.in4Product(_id); 
+        
         if (!product) {
             return res.status(404).send("Product not found");
+        } else {
+            const checkRat = await theProduct.get_Product(_id); 
+            const checkuser = await theProduct.checkRate(userId, _id); 
+            
+            if (!checkuser) {
+                req.flash('error', 'Bạn chưa mua sản phẩm nên không thể đánh giá');
+                return res.redirect(`/theProduct/${_id}`);
+            }
+            
+            if (checkRat && checkRat.comments && checkRat.comments.some(comment => comment.userId === userId)) {
+                req.flash('error', 'Bạn đã đánh giá sản phẩm này rồi');
+                return res.redirect(`/theProduct/${_id}`);
+            }
+
+            res.render('RateProduct', { 
+                name: product.name,
+                image: product.image,
+                _id: product._id,
+            });
         }
-        res.render('RateProduct', { 
-            name: product.name,
-            image: product.image,
-            _id : product._id,
-        });
     } catch (err) {
-        console.log("Lỗi in4_Product(Controller): ", err);
-        return false;
+        console.log("Lỗi getRate (Controller): ", err);
+        return res.status(500).send("Internal Server Error");
     }
 }
+
 
 const rateTheProduct = async (req, res) => {
     const { _id } = req.params;
@@ -121,8 +155,8 @@ const rateTheProduct = async (req, res) => {
         if (!userId) {
             return res.status(401).redirect('/Error'); 
         }
-
-        const rating = parseFloat(rate);
+    
+        const rating = parseFloat(rate);    
         const newRate = await rateProduct(_id, userId, userName, rating, comments);
 
         if (newRate) {
@@ -141,7 +175,7 @@ const rateTheProduct = async (req, res) => {
 const wareHouses = async (req, res) => {
     try {
         const user_Id = req.session.userData._id; 
-        const yourStores = await wareHouse(user_Id);
+        const yourStores = await theProduct.wareHouse(user_Id);
 
         if (!yourStores ) {
             console.log('No stores found for user:', user_Id);
@@ -153,8 +187,6 @@ const wareHouses = async (req, res) => {
             warehouses: yourStores
         });
 
-        console.log('Warehouse data for user:', yourStores);
-
     } catch (err) {
         console.error("Error in wareHouses(Controller): ", err);
         req.flash('error', 'Failed to retrieve your warehouse data');
@@ -162,7 +194,7 @@ const wareHouses = async (req, res) => {
     }
 };
 const Del_products = async (req, res) => {
-    const { _id } = req.params; // Corrected the destructuring
+    const { _id } = req.params; 
     const user_Id = req.session.userData._id;
 
     try {
@@ -193,7 +225,7 @@ const Update_products = async (req, res) => {
             return res.status(401).redirect('/Error');
         }
         const in4_Product = {name, price, describe, quanlity};
-        const productUpdated = await Update_product(_id, in4_Product);
+        const productUpdated = await theProduct.Update_product(_id, in4_Product);
         if (productUpdated) {
             req.flash('success', 'Sản phẩm đã được cập nhật');
             return res.redirect('/wareHouses');
@@ -212,10 +244,10 @@ const get_a_Product = async (req, res) => {
     const user_Id = req.session.userData._id;
 
     try {
-    if(user_Id){
+    if(!user_Id){
         console.log("Lôĩ ở phần xác nhận Get Product");
     } 
-        const product = await get_Product(_id);
+        const product = await theProduct.get_Product(_id);
         if (!product) {
             return res.status(404).send("Sản phẩm ko tồn tại");
         }
@@ -233,6 +265,86 @@ const get_a_Product = async (req, res) => {
         return res.status(401).redirect('/Error'); 
     }
 }
+const getSale = async(req, res, next) => {
+    const { _id } = req.params;
+    const user_Id = req.session.userData._id;
+    if(!user_Id){
+        console.log("L��i hệ thống xác nhận ngừoi dùng");
+        return res.redirect('/wareHouses');
+    }
+    const product = await get_Product(_id);
+    if (!product) {
+        return res.status(404).send("Sản phẩm ko tồn tại");
+    }
+    res.render('saleProduct', {
+        _id: product._id,
+        name: product.name,
+        price: product.price,
+
+    });
+}
+const Sale_Product = async(req, res, next) => {
+    try{
+        const { _id } = req.params;
+        const user_Id = req.session.userData._id;
+        const {sale} = req.body;
+        if(!user_Id){
+            console.log("Lỗi hệ thống xác nhận ngừoi dùng");
+            return res.redirect('/wareHouses');
+
+        }
+        const Sale_it = await theProduct.sale_product(_id, sale);
+        if(!Sale_it){
+            console.log("L��i khi giảm giá sản phẩm");
+            req.flash('error', 'Lỗi giảm giá sản phẩm');
+            return res.redirect(`/SaleProduct/${_id}`);
+            
+        }
+        console.log("sale success");
+        return res.redirect(`/SaleProduct/${_id}`);
+
+    }catch(err){
+        console.log("Error in Sale_Product(Controller): ", err);
+        return res.status(500).redirect('/Error'); 
+
+    }
+}
+const Responsice_Sales = async(req, res) => {
+    try{
+        const {_id} = req.params;
+        const user_Id = req.session.userData._id;
+            if(!user_Id){
+            console.log("L��i hệ thống xác nhận ngừoi dùng");
+            return res.redirect('/wareHouses');
+        }
+        const responsice_product = await theProduct.Responsice_Sale(_id);
+        if(!responsice_product){
+            console.log("Lỗii khi trả lại sản phẩm");
+            req.flash('error', 'Failed to responsice product');
+            return res.redirect(`/wareHouses`);
+        }
+        console.log("Responsice success");
+        req.flash('success','Khôi phục giá gốc thành công');    
+        return res.redirect(`/wareHouses`);
 
 
-module.exports = {listProducts,  AddProducts, findTypes, in4_Products, rateTheProduct, getRate , wareHouses, Del_products, get_a_Product, Update_products};
+    }catch(err){
+        console.log("Error in Responsice_Sales(Controller): ", err);
+        return res.status(500).redirect('/Error');  
+    }
+}
+module.exports = {
+    listProducts, 
+    AddProducts,
+    findTypes, 
+    in4_Products, 
+    rateTheProduct, 
+    getRate , 
+    wareHouses, 
+    Del_products, 
+    get_a_Product, 
+    Update_products, 
+    Sale_Product, 
+    getSale,
+    Responsice_Sales,
+};

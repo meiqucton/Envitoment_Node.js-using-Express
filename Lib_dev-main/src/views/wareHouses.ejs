@@ -27,9 +27,9 @@
                 <% warehouses.forEach(warehouse => { %>
                     <li>
                         <div class="warehouse-card">
+                            <img src="data:<%= warehouse.image.contentType %>;base64, <%= warehouse.image.data.toString('base64') %>" alt="<%= warehouse.name %>">
                             <h2><%= warehouse.name %></h2>
                             <p>Price: <%= warehouse.price %></p>
-                            <img src="<%= warehouse.image %>" alt="Warehouse Image">
                             <p>Type: <%= warehouse.type %></p>
                             <p> quanlity: (<%= warehouse.quanlity %>)</p>
                             <p>Description: <%= warehouse.describe %></p>
@@ -37,11 +37,19 @@
                             <p>Shop Name: <%= warehouse.userName %></p>
                             <div class="button-function">
                                 <form action="/updateProduct/<%=warehouse._id%>" method="get">
-                                    <button type="submit" class="update-button">Update</button>
+                                    <button type="submit" class="update-button"><i class="fa-solid fa-pen-to-square"></i></button>
+                                </form>
+                                <form action="oderManagement/<%=warehouse._id%>" method="get">
+                                    <button type="submit" class="oder-management-button"><i class="fa-solid fa-file-invoice"></i></button>
+                                </form>
+                                <form action="/SaleProduct/<%= warehouse._id %>" method="get">
+                                    <button type="submit" class="sale-button"><i class="fa-solid fa-ticket"></i></button>
                                 </form>
                                 <form action="/deleteProduct/<%= warehouse._id %>" method="post">
-                                    <button type="submit" class="delete-button">Delete</button>
+                                    <button type="submit" class="delete-button"><i class="fa-solid fa-trash"></i></button>
                                 </form>
+                               
+                            
                             </div>
                         </div>
                     </li>

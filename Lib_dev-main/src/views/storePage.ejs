@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>getTheStore</title>
+    <link href="/css/navagativeBarmini.css" type="text/css" rel="stylesheet">
+    <link href="/css/ShopPage.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">  
+</head>
+<body>
+    <div class="container">
+        <section class="banner">
+            <div class="banner-inner">
+            </div>
+        </section>
+        <section class="products">
+            <div class="product-list">       
+            <% if (getTheStore && getTheStore.length > 0) { %>
+                <% getTheStore.forEach(store => { %>
+                    <div class="product">
+                        <% if (store.image && store.image.data) { %>
+                            <img src="data:<%= store.image.contentType %>;base64,<%= store.image.data.toString('base64') %>" alt="<%= store.name %>">
+                        <% } else { %>
+                            <img src="/default-placeholder.jpg" alt="Default Image">
+                        <% } %>
+                        <h3><%= store.name %></h3>
+                        <p><%= store.price %> VND</p>
+                        <form action="/theProduct/<%= store._id %>" method="get">
+                            <button type="submit">Thông tin sản phẩm</button>
+                        </form>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p>No warehouses found.</p>
+            <% } %>
+        </div>
+    </section>
+</body>
+</html>

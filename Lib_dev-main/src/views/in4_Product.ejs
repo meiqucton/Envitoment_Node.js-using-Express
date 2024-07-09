@@ -26,7 +26,7 @@
         <div class="product-content">
             <div class="product-image">
                 <div class="main-image">
-                    <img src="<%= image %>" alt="<%= name %>">
+                    <img src="data: <%= image.contentType %>;base64,<%= image.data.toString('base64') %>"   alt="<%= name %>">
                 </div>
             </div>
             <div class="product-details">
@@ -40,18 +40,19 @@
                     <p>(<%= quanlity %>)</p>
                     <p><%= describe %></p>
                 </div>
+                <form action="/Store/<%= userId %>" method="get">
+                    <button type="submit">Store</button>
+                </form>
                 <form action="/Product/Buy/<%= _id %>" method="get">
-                    <button class="command-to-cart-button">buy now </button>
+                    <button class="command-to-cart-button"><i class="fa-solid fa-cart-shopping"></i></button>
                 </form>
                 <form action="/Product/Rate/<%= _id %>" method="get">
-                    <button class="command-to-cart-button">Rate</button>
+                    <button class="command-to-cart-button"><i class="fa-solid fa-star"></i></button>
                 </form>
             </div>
-            </form> <!-- Closing the form -->
+            </form>
         </div>
     </div>
-
-    <!-- The Modal -->
   
     <script src="/js/buyFunction.js"></script>
 

@@ -21,7 +21,7 @@
     <% } %>
     <div class="product-container">
         <div class="main-image">
-            <img src="<%= image %>" alt="<%= name %>">
+            <img src="data: <%= image.contentType %>;base64,<%= image.data.toString('base64') %>"   alt="<%= name %>">
         </div>
         <div class="product-details">
             <h1 class="product-title"><%= name %></h1>

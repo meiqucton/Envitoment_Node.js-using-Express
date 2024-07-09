@@ -2,16 +2,19 @@ require('dotenv').config();
 const client = require('../config/Mongoo_DB');
 const { ObjectId } = require('mongodb');
 
+
 const AddProduct = async (theProducts) => {
     try {
+        await client.connect();
         const db = client.db(process.env.NAME_DATABASE);
         const newProduct = await db.collection("Products").insertOne(theProducts);
         return newProduct.insertedId;
     } catch (err) {
         throw new Error("Error adding product: " + err.message);
+    } finally {
+        await client.close();
     }
 };
-
 const listProduct = async () => {
     try {
         const db = client.db(process.env.NAME_DATABASE);
@@ -21,7 +24,6 @@ const listProduct = async () => {
         return false;
     }
 };
-
 const findType = async (Find) => {
     try {
         const db = client.db(process.env.NAME_DATABASE);
@@ -139,6 +141,67 @@ const get_Product = async (product_id) => {
         return false;
     }
 };
+const sale_product = async (product_id, sale) => {
+    try {
+        const db = client.db(process.env.NAME_DATABASE);
+        const productId = new ObjectId(product_id);
+        const findproduct = await db.collection("Products").findOne({ _id: productId });
+
+        if (!findproduct) {
+            console.error("Product not found");
+            return false;
+        } else {
+            const sale_amount = (findproduct.price / 100) * sale;
+            const result = findproduct.price - sale_amount;
+            const sale_product_id = await db.collection("Products").updateOne(
+                { _id: productId },
+                { $set: { price: result, original_price: findproduct.price },
+            }
+            );
+            return sale_product_id.modifiedCount > 0;
+        }
+    } catch (err) {
+        console.log("Error in sale_product function: ", err);
+        return false;
+    }
+}
+const Responsice_Sale = async (product_id) => {
+    try{
+        const db = client.db(process.env.NAME_DATABASE);
+        const productId = new ObjectId( product_id);
+        const findproduct = await db.collection("Products").findOne({ _id: productId });
+        if(!findproduct || !findproduct.original_price){
+            console.error("Product not found or original price not found");
+            return false;
+        }
+        await db.collection("Products").updateOne(
+            { _id: productId },
+            { $set: { price: findproduct.original_price}, 
+                     $unset : {original_price: " "},
+            }
+        );
+        return true;    
+
+    }catch(err){
+        console.error("Lỗi responsice_product", err);
+    }
+}
+const checkRate = async (user_id, product_id) => {
+    try {
+        const db = client.db(process.env.NAME_DATABASE);
+        const productId = new ObjectId(product_id);
+        const checkUser = await db.collection("yourOrder").findOne({ id_user: user_id, Product_id: productId });
+        
+        if (checkUser) {
+            return true; 
+        } else {
+            return false;
+        }
+    } catch (err) {
+        console.error("Lỗi checkRate: ", err);
+        return false; 
+    }
+}
 
 module.exports = {
     AddProduct,
@@ -150,4 +213,7 @@ module.exports = {
     Del_product,
     Update_product,
     get_Product,
+    sale_product,
+    Responsice_Sale,
+    checkRate,
 };

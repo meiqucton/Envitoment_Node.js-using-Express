@@ -1,41 +1,50 @@
-const { checkEmail, register, Login, forgotPassword, in4User, updateAdress } = require('../model/Mongodb_User');
+const { checkEmail, register, Login, forgotPassword, in4User, updateAdress, updatePassword } = require('../model/Mongodb_User');
+const theProduct = require('../model/Mongodb_Product');
 const confirmEmail = require('../config/Send_Mail');
 const otpGenerator = require('otp-generator');
+const jwt = require('jsonwebtoken');
 
-let otp; // Global variable to store OTP
-
+let otp;
 const createAccount = async (req, res) => {
     const { UserName, Password, Email, BirthDay } = req.body;
 
     try {
-        
         if (!UserName || !Password || !Email || !BirthDay) {
             req.flash('error', 'Vui lòng nhập đầy đủ thông tin');
             return res.redirect('/');
         }
 
+       
         const passwordFormat = /^(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
         if (!passwordFormat.test(Password)) {
             req.flash('error', 'Mật khẩu không đủ mạnh (ít nhất 8 ký tự, có ít nhất một chữ hoa và một ký tự đặc biệt)');
             return res.redirect('/');
         }
 
+      
         const currentDate = new Date();
         const dateOfBirthDay = new Date(BirthDay);
         const age = currentDate.getFullYear() - dateOfBirthDay.getFullYear();
+        if (currentDate < new Date(currentDate.getFullYear(), dateOfBirthDay.getMonth(), dateOfBirthDay.getDate())) {
+            age--;
+        }
         if (age < 18) {
             req.flash('error', 'Bạn chưa đủ tuổi để đăng ký');
             return res.redirect('/');
         }
 
+       
         const emailExists = await checkEmail(Email);
         if (emailExists) {
             req.flash('error', 'Email đã tồn tại');
             return res.redirect('/');
         }
 
-        otp = otpGenerator.generate(6, { digits: true, alphabets: false, upperCase: false, specialChars: false });
+        
+        const otp = otpGenerator.generate(6, { digits: true, alphabets: false, upperCase: false, specialChars: false });
+        req.session.otp = otp;
 
+       
         await confirmEmail.sendEmail(Email, 'Mã Xác Nhận',
             `<!DOCTYPE html>
             <html lang="en">
@@ -44,30 +53,33 @@ const createAccount = async (req, res) => {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Xác nhận đăng ký tài khoản</title>
                 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-                <link href="/css/mailOTP.css" type="text/css" rel="stylesheet">
+                <style>
+                    body { font-family: 'Roboto', sans-serif; }
+                    .container { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }
+                    h2 { color: #333; }
+                    ul { list-style-type: none; padding: 0; }
+                    li { margin: 10px 0; }
+                </style>
             </head>
             <body>
                 <div class="container">
                     <h2>Xác nhận đăng ký tài khoản</h2>
                     <p>Cảm ơn bạn đã đăng ký tài khoản!</p>
                     <ul>
-                        <li>
-                            <strong>Username:</strong> ${UserName}
-                        </li>
-                        <li>
-                            <strong>OTP:</strong> ${otp}
-                        </li>
+                        <li><strong>Username:</strong> ${UserName}</li>
+                        <li><strong>OTP:</strong> ${otp}</li>
                     </ul>
                 </div>
-            </body>
+            </body> 
             </html>`
         );
 
+        // Store user data in session
         req.session.userData = { UserName, Password, Email, BirthDay };
         return res.redirect('/checkOTP');
         
     } catch (err) {
-        console.log(err);
+        console.error(err);
         req.flash('error', 'Lỗi máy chủ nội bộ khi tạo người dùng');
         return res.status(500).redirect('/');
     }
@@ -76,16 +88,21 @@ const createAccount = async (req, res) => {
 const get_OTP = async (req, res) => {
     try {
         const { getOTP } = req.body;
+        const { otp } = req.session;
 
+        
         if (!getOTP) {
             req.flash('error', 'Vui lòng nhập mã xác nhận');
             return res.redirect('/checkOTP');
         }
 
+     
         if (getOTP === otp) {
             const { UserName, Password, Email, BirthDay } = req.session.userData;
             delete req.session.userData;
+            delete req.session.otp;
 
+            
             await register({ UserName, Password, Email, BirthDay });
             req.flash('success', 'Tạo tài khoản thành công');
             return res.redirect('/'); 
@@ -94,7 +111,7 @@ const get_OTP = async (req, res) => {
             return res.redirect('/checkOTP');
         }
     } catch (err) {
-        console.log(err);
+        console.error(err);
         req.flash('error', 'Lỗi máy chủ nội bộ khi xác nhận OTP');
         return res.status(500).redirect('/');
     }
@@ -135,46 +152,64 @@ const forgot_Password = async (req, res) => {
         }
 
         const user = await forgotPassword(Email);
-
-        if (user) {
-            const { UserName, Password } = user;
-            req.flash('success', 'Thông tin tài khoản đã được gửi đến mail của bạn');
-            await confirmEmail.sendEmail(Email, 'Quên Mật khẩu',
+        if(!user){
+            req.flash('error', 'Email không tồn tại');
+            return res.redirect('/FogotPass');
+        }
+        const token = jwt.sign({Email}, 'secret', {expiresIn: '1h'}); 
+        const confirmationUrl = `${req.protocol}://${req.get('host')}/forgotPass/${token}`;
+        await confirmEmail.sendEmail(Email, 'Quên mật khẩu',
                 `<!DOCTYPE html>
                 <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Lấy lại mật khẩu</title>
-                    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-                    <link href="/css/mailOTP.css" type="text/css" rel="stylesheet">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Xác nhận mua hàng</title>
+                <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+                <link href="/css/mailOTP.css" type="text/css" rel="stylesheet">
                 </head>
-                <body>
-                    <div class="container">
-                        <h2>Thông tin mật khẩu của bạn</h2>
-                        <ul>
-                            <li>
-                                <strong>Username:</strong> ${UserName}
-                            </li>
-                            <li>
-                                <strong>Password:</strong> ${Password}
-                            </li>
-                        </ul>
-                    </div>
-                </body>
-                </html>`
-            );
-            return res.redirect('/');
-        } else {
-            req.flash('error', 'Email không tồn tại');
-            return res.redirect('/forgotPass');
-        }
+            <body>
+                <div class="container">
+                    <h2>Xác nhận Quên mật khẩu</h2>
+                    <a href="${confirmationUrl}" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Xác nhận tài khoản</a>
+                </div>
+            </body>
+        </html>`        
+        );
+        req.flash('success','Vui lòng vào email để xác nhận');
+        return res.redirect('/');
     } catch (err) {
         console.log(err);
         req.flash('error', 'Lỗi máy chủ nội bộ khi khôi phục mật khẩu');
         return res.status(500).redirect('/');
     }
 };
+const confirmfogotEmail = async(req, res) => {
+    try{
+        const token = req.params.token;
+        const getJWT = jwt.verify(token,'secret');
+        const {Email} = getJWT;
+        if(!getJWT){
+            req.flash('error', 'Token không Hợp lệ');
+            return res.redirect('/');
+        }
+        const user = await forgotPassword(Email);
+        if(!user){
+            req.flash('error', 'Email không tồn tại');
+            return res.redirect('/');
+        }
+        res.render('changePassword', {
+            UserName: user.UserName,
+            Email: user.Email
+
+        });
+    }
+    catch(err){
+        console.log(err);
+        req.flash('error', 'L��i máy chủ nội bộ khi xác nhận mật khẩu');
+        return res.status(500).redirect('/');
+    }
+}
 const getUser = async (req, res) => {
     
     try{
@@ -201,6 +236,29 @@ const getUser = async (req, res) => {
         console.log(err);
         req.flash('error', 'L��i máy chủ nội bộ khi lấy thông tin người dùng');
         return res.status(500).redirect('/Error');
+    }
+}
+const changePassword = async (req, res) => {
+    try{
+        const {Email} = req.params;
+        const {password} = req.body;
+        const user = await forgotPassword(Email);
+        if(!user){
+            req.flash('error', 'Email không tồn tại');
+            return res.redirect('/');
+        }
+        const Changed = await updatePassword(Email, password);
+        if(!Changed){
+            console.log('Không thể thay đ��i mật khẩu');
+            req.flash('error', 'Mật khẩu không thay đ��i');
+            return res.redirect('/forgotPass');
+        }
+        req.flash('success', 'Đổi mật khẩu thành công');
+        return res.redirect('/');
+    }
+    catch(err){
+        console.log(err)
+        req.flash('error', 'L��i máy chủ nội bộ khi đ��i mật khẩu');
     }
 }
 const profileUser = async (req, res) => {
@@ -256,7 +314,28 @@ const Address = async(req, res) => {
         return res.status(500).redirect('/Error');
     }       
 };
-
+const getStore = async(req, res) => {
+    const { userId } = req.params;
+    const user_Id = req.session.userData._id; 
+    try{
+        if(!user_Id){
+            req.flash('error','Vui lòng đăng nhập trước khi xem sản phẩm');
+            console.log('Không tìm thấy máy chủ của người dùng ở phần Controller(getStore)');
+            return res.status(404).redirect('/');
+        }
+        const getStore = await theProduct.wareHouse(userId);
+        if(!getStore){
+            req.flash('error', 'Không tìm thấy cửa hàng này');
+            console.log('Không tìm thấy cửa hàng này');
+            return res.redirect(`/theProduct/${_id}`);
+        }
+        res.render('storePage', {
+            getTheStore: getStore,
+        });
+    }catch(err){
+        console.log('Lỗi getStore: ' + err);
+    }   
+}   
 module.exports = {
     createAccount,
     get_OTP,    
@@ -264,6 +343,8 @@ module.exports = {
     forgot_Password,
     profileUser,
     Address,
-    getUser
-
+    getUser, 
+    confirmfogotEmail,
+    changePassword,
+    getStore,
 };

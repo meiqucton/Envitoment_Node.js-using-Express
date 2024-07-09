@@ -6,9 +6,11 @@ body, html {
 
 .warehouse-container {
     display: flex;
-    justify-content: center;
+    flex-wrap: wrap;
+    justify-content: space-around;
     margin-top: 20px;
 }
+
 
 .warehouse-list {
     display: flex;
@@ -61,7 +63,7 @@ body, html {
     justify-content: space-between;
 }
 
-.update-button, .delete-button {
+.update-button, .delete-button, .oder-management-button, .sale-button {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -71,15 +73,18 @@ body, html {
 }
 
 .update-button {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #9da1b6;
 }
 
 .delete-button {
-    background-color: #f44336;
-    color: white;
+    background-color: #9da1b6;
 }
-
+.sale-button{
+    background-color: #9da1b6;
+}
+.oder-management-button{
+    background-color: #9da1b6;
+}
 .update-button:hover {
     background-color: #45a049;
 }
@@ -87,10 +92,10 @@ body, html {
 .delete-button:hover {
     background-color: #e53935;
 }
+.sale-button:hover{
+    background-color: #dede26;
+}
+.oder-management-button:hover{
+    background-color: #f16823;
 
-@media (max-width: 768px) {
-    .warehouse-list {
-        flex-direction: column;
-        align-items: center;
-    }
 }

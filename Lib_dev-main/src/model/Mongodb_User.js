@@ -46,6 +46,16 @@ const forgotPassword = async (Email) => {
         return false;
     }
 }
+const updatePassword = async (Email, Password) => {
+    await client.connect();
+    try{
+        return await client.db(process.env.NAME_DATABASE).collection('User').updateOne({Email: Email}, {$set: {Password: Password}});
+    }
+    catch(err){
+        console.log("L��i updatePassword", err);
+        return false;
+    }
+}
 const in4User = async (user_Id) => {
     await client.connect();
     try{
@@ -82,7 +92,6 @@ const updateAdress = async (userId , country, city, conscious, stressName, phone
 
 }
 
-
 module.exports = {
     register,
     checkEmail,
@@ -90,4 +99,5 @@ module.exports = {
     forgotPassword,
     in4User,
     updateAdress,
+    updatePassword,
 };

@@ -168,3 +168,19 @@ body {
     color: #666;
     margin-top: 5px;
 }
+
+
+.command-to-cart-button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.command-to-cart-button:hover {
+    background-color: #ff6347;
+}

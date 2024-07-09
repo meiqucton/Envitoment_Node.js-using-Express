@@ -1,0 +1,28 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sale Product </title>
+</head>
+<body>
+    <% if (typeof messages !== 'undefined' && messages.error) { %>
+        <div class="notification error-notification">
+            <%= messages.error %>
+        </div>
+    <% } %>
+    <% if (typeof messages !== 'undefined' && messages.success) { %>
+        <div class="notification success-notification">
+            <%= messages.success %>
+        </div>
+    <% } %>
+    <h1> <%= name %></h1>
+    <form action="/SaleProduct/<%=_id %>" method="post"> 
+        <p> <%= price %></p>
+        <input type ="number" name="sale" id="sale" placeholder="Enter sale">
+        <button type ="submit">SALE </button>
+    </form>
+    <form action="/Responsice/<%=_id%>" method="post">
+        <button type ="submit">Responsive sale</button>
+    </form>
+</body>
+</html>

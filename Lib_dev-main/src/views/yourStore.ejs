@@ -3,7 +3,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your store</title>
-    <link href="/css/in4Product.css" type="text/css" rel="stylesheet">
+    <link href="/css/yourStore.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 </head>
 <body>
@@ -11,14 +12,13 @@
     <div class="product-container">
 
     <form action="/addProduct" method = "get">
-        <button type="submit">Thêm sản phẩm</button> 
+        <button class="addProduct-button" type="submit"><i class="fa-solid fa-cart-plus"></i></button> 
     </form>
-    <form action="/order" method = "get">
-        <button type="submit">Đơn hàng</button> 
-    </form>
+
     <form action="/wareHouses" method = "get">
-        <button type="submit">Kho hàng </button> 
+        <button class="warehouse-button"type="submit"><i class="fa-solid fa-warehouse"></i> </button> 
     </form>
+
     </div>  
 </body>
 </html>

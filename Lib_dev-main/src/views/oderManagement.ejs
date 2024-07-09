@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quảng lý bán hàng </title>
+    <link rel="stylesheet" href="/css/Warehourse.css" type="text/css">
+    <link href="/css/notifacation.css " type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="warehouse-container">
+     
+        <% if (theproductOder && theproductOder.length > 0) { %>
+               
+            <ul class="warehouse-list">
+                <% theproductOder.forEach(order => { %>
+                    <li class="warehouse-card">
+                        <h2>Id: <%= order._id %></h2>
+                        <p><strong>User Name:</strong> <%= order.name_user %></p>
+                        <p><strong>Product Name:</strong> <%= order.product_name %></p>
+                        <p><strong>Size:</strong> <%= order.size %></p>
+                        <p><strong>Quantity:</strong> <%= order.quanlity %></p>
+                        <p><strong>Address:</strong> <%= order.Address.country %> - 
+                            <%= order.Address.city %> - 
+                            <%= order.Address.conscious %> - 
+                            <%= order.Address.stressName %>
+                        </p>
+                        <p><strong>Phone:</strong> <%= order.Address.phoneNumber %></p>
+                        <p><strong>Date:</strong> <%= order.orderDate %></p>
+                    </li>
+                <% }) %>
+            </ul>
+        <% } else { %>
+            <p class="no-warehouses">No warehouses found.</p>
+        <% } %>   
+    </div>
+
+</body>
+</html>

@@ -3,60 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products</title>
+    <title>TonShop</title>
+    <link href="/css/navagativeBarmini.css" type="text/css" rel="stylesheet">
     <link href="/css/ShopPage.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    <!-- Header -->
     <header>
         <div class="container">
             <h1>TonShop</h1>
             <nav>
                 <ul>
-                    <li><a href="#">Trang Chủ</a></li>
-                    <li><a href="#">Sản Phẩm</a></li>
-                    <li><a href="#">Liên Hệ</a></li>
-                    <li><form action="/findType" method="POST">
-                        <select name="findtype" id="findtype" onchange="redirectToProduct()">
-                            <option value="shirt">shirt</option>
-                            <option value="coat">coat</option>
-                            <option value="pants">pants</option>
-                            <option value="hat">hat</option>
-                            <option value="watch">watch</option>
-                            <option value="shoes">shoes</option>
-                            <option value="bag">bag</option>
-                            <option value="outfit">outfit</option>
-                            <option value="dress">dress</option>
-                        </select>
-                    </form>
-                    
-                    <script>
-                        function redirectToProduct() {
-                            var selectedType = document.getElementById("findtype").value;
-                            window.location.href = "/products/" + selectedType;
-                        }
-                    </script>
+                    <div class="header">
+                    <li>
+                        <form action="/findType" method="POST">
+                            <select name="findtype" id="findtype" onchange="redirectToProduct()">
+                                <option value="shirt">shirt</option>
+                                <option value="coat">coat</option>
+                                <option value="pants">pants</option>
+                                <option value="hat">hat</option>
+                                <option value="watch">watch</option>
+                                <option value="shoes">shoes</option>
+                                <option value="bag">bag</option>
+                                <option value="outfit">outfit</option>
+                                <option value="dress">dress</option>
+                            </select>
+                        </form>
                     </li>
+                    <li><a href="/oderManagement"><i class="fa-solid fa-truck"></i></a></li>
+                </div>
                 </ul>
             </nav>
         </div>
     </header>
-    <div class="Title">
-        <%= type %>
-    </div>
-    <div class="container">
-    <section class="products">
-        <div class="product-list">
-            <% products.forEach(product => { %>
-            <div class="product">
-                <img src="<%= product.image %>" alt="<%= product.name %>">
-                <h3><%= product.name %></h3>
-                <p><%= product.price %> VND</p>
-                <form action="/theProduct/<%=product._id%>" method="get">
-                    <button type="submit">Thông tin sản phẩm</button>
-                </form>
-            <% }) %>
+
+    <script>
+        function redirectToProduct() {
+            var selectedType = document.getElementById("findtype").value;
+            window.location.href = "/products/" + selectedType;
+        }
+    </script>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <!-- Banner -->
+            <section class="banner">
+                <div class="banner-inner">
+                </div>
+            </section>
+
+            <!-- Product Section -->
+            <section class="products">
+                    <div class="product-list">
+                    <% products.forEach(product => { %>
+                        <div class="product">
+                            <% if (product.image && product.image.data) { %>
+                                <img src="data:<%= product.image.contentType %>;base64, <%= product.image.data.toString('base64') %>" alt="<%= product.name %>">
+                            <% } else { %>
+                                <img src="/default-placeholder.jpg" alt="Default Image">
+                            <% } %>
+                            <h3><%= product.name %></h3>
+                            <p><%= product.price %> VND</p>
+                            <form action="/theProduct/<%= product._id %>" method="get">
+                                <button type="submit">Thông tin sản phẩm</button>
+                            </form>
+                        </div>
+                    <% }); %>
+                </div>
+            </section>
         </div>
-        </section>
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 TonShop. All rights reserved.</p>
+        </div>
+    </footer>
 </body>
 </html>
