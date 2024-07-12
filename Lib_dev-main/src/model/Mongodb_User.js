@@ -89,7 +89,49 @@ const updateAdress = async (userId , country, city, conscious, stressName, phone
         console.log("L��i updateAdress", err);
         return false;
     }
-
+}
+const folow_Store = async(user_Id, id_store) => {
+    try{
+        const userId = new ObjectId(user_Id);
+        const id_follw = await client.db(process.env.NAME_DATABASE).collection('User').updateOne(
+            {_id: userId},{
+                $push: {
+                    follow_store: {
+                        id_store,
+                        
+                    }
+                }
+        })
+        return id_follw.matchedCount > 0;
+    }catch(err){
+        console.log("lỗi folow_store", err);
+        return false;
+    }
+}
+const createrVoucher = async(Voucher) => {
+    try{
+        const createrVoucher = await client.db(process.env.NAME_DATABASE).collection('Vocher').insertOne(Voucher);
+        return createrVoucher.insertedId;
+    }catch(err){
+        console.log("loi createrVoucher", err);
+        return false;
+    }
+}
+const getVoucher = async(voucherCode) => {
+    try{
+        return await client.db(process.env.NAME_DATABASE).collection('Vocher').findOne({codeVoucher: voucherCode});
+    }catch(err){
+        console.log("loi getVoucher", err);
+        return false;
+    }
+}
+const updateVoucher = async(Id_voucher, quanlityVoucher) => {
+    try{
+        const voucher = await client.db(process.env.NAME_DATABASE).collection('Voucher').updateOne({_id: Id_voucher}, {$set: {useQuantity: quanlityVoucher }})
+    }catch(err){
+        console.log("loi updateVoucher", err);
+        return false;
+    }
 }
 
 module.exports = {
@@ -100,4 +142,7 @@ module.exports = {
     in4User,
     updateAdress,
     updatePassword,
+    folow_Store,
+    createrVoucher, 
+    getVoucher,
 };

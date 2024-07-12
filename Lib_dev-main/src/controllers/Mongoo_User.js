@@ -1,4 +1,4 @@
-const { checkEmail, register, Login, forgotPassword, in4User, updateAdress, updatePassword } = require('../model/Mongodb_User');
+const { checkEmail, register, Login, forgotPassword, in4User, updateAdress, updatePassword, folow_Store, createrVoucher} = require('../model/Mongodb_User');
 const theProduct = require('../model/Mongodb_Product');
 const confirmEmail = require('../config/Send_Mail');
 const otpGenerator = require('otp-generator');
@@ -321,7 +321,7 @@ const getStore = async(req, res) => {
         if(!user_Id){
             req.flash('error','Vui lòng đăng nhập trước khi xem sản phẩm');
             console.log('Không tìm thấy máy chủ của người dùng ở phần Controller(getStore)');
-            return res.status(404).redirect('/');
+            return res.status(404).redirect('/');   
         }
         const getStore = await theProduct.wareHouse(userId);
         if(!getStore){
@@ -335,7 +335,73 @@ const getStore = async(req, res) => {
     }catch(err){
         console.log('Lỗi getStore: ' + err);
     }   
-}   
+}
+const folowStore = async (req, res) => {
+    try {
+        const _id = req.params.id;
+        const user_Id = req.session.userData._id;
+        const storeId = req.params.userId;
+
+        if (!user_Id) {
+            req.flash('error', 'Vui lòng đăng nhập trước khi theo dõi cửa hàng');
+            console.log('Không tìm thấy máy chủ của người dùng ở phần Controller(folow_Store)');
+            return res.status(404).redirect('/');
+        }
+        const folow = await folow_Store(user_Id, storeId);
+
+        const checkFollow = await in4User(user_Id);
+        const checkFollowLast = checkFollow.follow_store.map(store => store.id_store);
+
+        if (checkFollowLast.includes(storeId)) {
+            req.flash('error', 'Bạn đã theo dõi cửa hàng này rồi');
+            console.log('Bạn đã theo dõi cửa hàng này rồi');
+            return res.redirect(`/shop`);
+        }
+
+        if (folow) {
+            console.log('Người dùng với ID:', user_Id, 'theo dõi cửa hàng với ID:', storeId);
+            req.flash('success', 'Theo dõi cửa hàng thành công');
+            return res.redirect('/Shop');
+        } else {
+            throw new Error('Không thể theo dõi cửa hàng');
+        }
+    } catch (err) {
+        console.log('Lỗi folow_Store: ' + err);
+        req.flash('error', 'Lỗi máy chủ nội bộ khi theo dõi cửa hàng');
+        return res.status(500).redirect('/');
+    }
+};
+
+const createrVouchers = async (req, res) => {
+    try{
+        const user_Id = req.session.userData._id;
+        const {codeVoucher, typeForProduct ,Discount, Expirationdate, useQuantity} = req.body;
+        if(!user_Id){
+            req.flash('error', 'Vui lòng đăng nhập trước khi tạo mã giảm giá');
+            console.log('Không tìm thấy máy chủ của người dùng ở phần Controller(createrVouchers)');
+            return res.status(404).redirect('/');
+        }
+      
+        const Voucher = {user_Id, codeVoucher, typeForProduct ,Discount, Expirationdate, useQuantity};
+        const createVoucher = await createrVoucher(Voucher);
+        if(!createVoucher){
+            console.log('Tạo mã giảm giá thất bại');
+            req.flash('error', 'Tạo mã giảm giá thất bại');
+        }
+        else{
+            console.log('Tạo mã giảm giá thành công');
+            req.flash('success', 'Tạo mã giảm giá thành công');
+            return res.redirect('/yourStore');
+        }
+    }
+    catch(error){
+        console.log('L��i createrVouchers: '+ error);
+        req.flash('error', 'Loii máy chủ nội bộ khi tạo mã giảm giá');
+        return res.status(500).redirect('/');
+    }
+};
+
+
 module.exports = {
     createAccount,
     get_OTP,    
@@ -347,4 +413,6 @@ module.exports = {
     confirmfogotEmail,
     changePassword,
     getStore,
+    folowStore,
+    createrVouchers,
 };

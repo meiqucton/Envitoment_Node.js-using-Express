@@ -24,17 +24,15 @@ const listProduct = async () => {
         return false;
     }
 };
-const findType = async (Find) => {
-    try {
+const findType = async(typeProduct) => {
+    try{
         const db = client.db(process.env.NAME_DATABASE);
-        const query = { type: Find };
-        return await db.collection("Products").find(query).toArray();
-    } catch (err) {
+        return await db.collection("Products").find({ type: typeProduct }).toArray();     
+    }catch(err){
         console.error("Error in findType(model): ", err);
         return false;
     }
-};
-
+}
 const in4Product = async (Product_id) => {
     try {
         const db = client.db(process.env.NAME_DATABASE);
@@ -151,20 +149,30 @@ const sale_product = async (product_id, sale) => {
             console.error("Product not found");
             return false;
         } else {
-            const sale_amount = (findproduct.price / 100) * sale;
-            const result = findproduct.price - sale_amount;
+            const originalPrice = parseFloat(findproduct.price); // Chuyển đổi giá thành số thực
+            const sale_amount = (originalPrice / 100) * sale; // Tính toán số tiền giảm giá
+            const theResult = (originalPrice - sale_amount) * 1000000; // Giá sau khi giảm giá
+            const result = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(theResult); // Định dạng giá sau khi giảm giá
+
             const sale_product_id = await db.collection("Products").updateOne(
                 { _id: productId },
-                { $set: { price: result, original_price: findproduct.price },
-            }
+                { $set: { 
+                    price: result , // Cập nhật giá sau khi giảm giá
+                    original_price: findproduct.price, // Lưu giá gốc
+                    Sale: sale, // Lưu tỉ lệ giảm giá
+                }},
             );
-            return sale_product_id.modifiedCount > 0;
+            console.log('ssale_amount', sale_amount);
+            console.log('theResult', theResult);
+            return sale_product_id.modifiedCount > 0; // Trả về true nếu cập nhật thành công
         }
     } catch (err) {
         console.log("Error in sale_product function: ", err);
         return false;
     }
 }
+
+    
 const Responsice_Sale = async (product_id) => {
     try{
         const db = client.db(process.env.NAME_DATABASE);
@@ -177,7 +185,7 @@ const Responsice_Sale = async (product_id) => {
         await db.collection("Products").updateOne(
             { _id: productId },
             { $set: { price: findproduct.original_price}, 
-                     $unset : {original_price: " "},
+                     $unset : {original_price: " ", Sale: ""},
             }
         );
         return true;    

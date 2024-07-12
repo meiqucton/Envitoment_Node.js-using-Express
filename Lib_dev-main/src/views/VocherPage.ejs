@@ -1,0 +1,31 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoucherPage </title>
+</head>
+<body>
+    <h1>Voucher Page</h1>
+    <p>This is a voucher page</p>
+   <form action="/CreateVoucher" method="post">
+        <input type="text" name="codeVoucher" placeholder="Enter code">
+        <select name="typeForProduct" id="itemtype" required>
+            <option value="all">all</option>
+            <option value="shirt">shirt</option>
+            <option value="coat">coat</option>
+            <option value="pants">pants</option>
+            <option value="hat">hat</option>
+            <option value="watch">watch</option>
+            <option value="shoes">shoes</option>
+            <option value="bag">bag</option>
+            <option value="outfit">outfit</option>
+            <option value="dress">dress</option>
+        </select>
+        <input type="number" name="Discount" placeholder="Enter value">
+        <input type="date" name="Expirationdate" placeholder="Enter start date">
+        <input type="number" name="useQuantity" placeholder="Enter Number">
+
+        <button type="submit">Create</button>
+   </form>
+</body>
+</html>

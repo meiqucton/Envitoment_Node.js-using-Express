@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Warehouses</title>
     <link rel="stylesheet" href="/css/Warehourse.css" type="text/css">
-    <link href="/css/notifacation.css " type="text/css" rel="stylesheet">
+    <link href="/css/notifacation.css" type="text/css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -27,20 +27,23 @@
                 <% warehouses.forEach(warehouse => { %>
                     <li>
                         <div class="warehouse-card">
-                            <img src="data:<%= warehouse.image.contentType %>;base64, <%= warehouse.image.data.toString('base64') %>" alt="<%= warehouse.name %>">
+                            <% if (warehouse.Sale) { %> <!-- Kiểm tra nếu sản phẩm đang giảm giá -->
+                                <div class="sale-badge"><%= warehouse.Sale %>%</div>
+                            <% } %>
+                            <img src="data:<%= warehouse.image.contentType %>;base64,<%= warehouse.image.data.toString('base64') %>" alt="<%= warehouse.name %>">
                             <h2><%= warehouse.name %></h2>
-                            <p>Price: <%= warehouse.price %></p>
-                            <p>Type: <%= warehouse.type %></p>
-                            <p> quanlity: (<%= warehouse.quanlity %>)</p>
-                            <p>Description: <%= warehouse.describe %></p>
-                            <p>Average Rating: <%= warehouse.averageRating %></p>
-                            <p>Shop Name: <%= warehouse.userName %></p>
+                            <p><strong>Price:</strong> <%= warehouse.price %></p>
+                            <p><strong>Type:</strong> <%= warehouse.type %></p>
+                            <p><strong>Quantity:</strong> <%= warehouse.quantity %></p>
+                            <p><strong>Description:</strong> <%= warehouse.describe %></p>
+                            <p><strong>Average Rating:</strong> <%= warehouse.averageRating %></p>
+                            <p><strong>Shop Name:</strong> <%= warehouse.userName %></p>
                             <div class="button-function">
-                                <form action="/updateProduct/<%=warehouse._id%>" method="get">
+                                <form action="/updateProduct/<%= warehouse._id %>" method="get">
                                     <button type="submit" class="update-button"><i class="fa-solid fa-pen-to-square"></i></button>
                                 </form>
-                                <form action="oderManagement/<%=warehouse._id%>" method="get">
-                                    <button type="submit" class="oder-management-button"><i class="fa-solid fa-file-invoice"></i></button>
+                                <form action="/orderManagement/<%= warehouse._id %>" method="get">
+                                    <button type="submit" class="order-management-button"><i class="fa-solid fa-file-invoice"></i></button>
                                 </form>
                                 <form action="/SaleProduct/<%= warehouse._id %>" method="get">
                                     <button type="submit" class="sale-button"><i class="fa-solid fa-ticket"></i></button>
@@ -48,8 +51,6 @@
                                 <form action="/deleteProduct/<%= warehouse._id %>" method="post">
                                     <button type="submit" class="delete-button"><i class="fa-solid fa-trash"></i></button>
                                 </form>
-                               
-                            
                             </div>
                         </div>
                     </li>

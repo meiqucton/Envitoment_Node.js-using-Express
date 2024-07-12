@@ -32,7 +32,16 @@
             <div class="product-details">
                 <h1><%= name %></h1>
                 <h2><%= userName %></h2>
-                <p class="product-price"><%= price %> VND</p>
+                <div class="flowFunction">
+                    <form action="/followStore/<%= userId %>" method="post">
+                        <button type="submit" class="follow-button"><i class="fa-solid fa-heart"></i></button>
+                    </form>
+                </div>
+                <% if(original_price) { %>
+                    <p><s><%= original_price %></s> --- <%= price %> (VND)  <span class="sale-badge"> <%= Sale %> %</span> </p>
+                <% } else { %>
+                    <p><%= price %> (VND)</p>
+                <% } %>
                 <div class="product-rating">
                     <span class="rating"><%= avgRate %></span>
                 </div>

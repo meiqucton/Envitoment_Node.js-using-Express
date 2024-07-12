@@ -1,6 +1,6 @@
-const { buy_Product, getOderProduct, yourProduct } = require('../model/mongodb_Oder');
+const  Mg_Oder = require('../model/mongodb_Oder');
 const theProduct = require('../model/Mongodb_Product');
-const Mg_user  = require('../model/Mongodb_User');
+const Mg_user = require('../model/Mongodb_User');
 const confirmEmail = require('../config/Send_Mail');
 
 const jwt = require('jsonwebtoken');
@@ -8,6 +8,7 @@ const nodemailer = require('nodemailer');
 
 const get_buy = async (req, res, next) => {
     const { _id } = req.params;
+    
 
     if (req.session && req.session.userData) {
         const user_Id = req.session.userData._id;
@@ -48,33 +49,40 @@ const get_buy = async (req, res, next) => {
         console.log("Session hoặc userData không tồn tại");
         res.status(401).send("Unauthorized");
     }
-};
-const buy_function = async (req, res) => {
-    // Kiểm tra session và userData của người dùng
+};const buy_function = async (req, res) => {
     if (req.session && req.session.userData) {
         try {
-            // Lấy _id sản phẩm từ params và thông tin người dùng từ session
             const _id = req.params._id;
             const id_user = req.session.userData._id;
             const name_user = req.session.userData.UserName;
             const addresses = req.session.userData.address;
-
-            // Lấy các thông tin sản phẩm và địa chỉ từ body request
-            const { size, theQuanlity, product_name, address_index } = req.body;
+            let discount = 0;
+            const { size, theQuanlity, product_name, address_index, voucherCode } = req.body;
             const selectedAddress = addresses[address_index];
-            // Kiểm tra xem có đủ thông tin người dùng không
             if (!id_user || !name_user) {
                 console.log('Lỗi hệ thống: Không xác nhận được người dùng mua');
                 return res.status(401).redirect('/Error');
             }
+            
+            if (voucherCode && voucherCode.trim() !== '') { // Check if voucherCode is provided
+                const getVoucher = await Mg_user.getVoucher(voucherCode);
+                if (getVoucher && getVoucher.Discount) {
+                    discount = parseInt(getVoucher.Discount);
+                
+            }
 
-            // Lấy thông tin sản phẩm từ hàm theProduct.get_Product
             const product = await theProduct.get_Product(_id);
             if (!product) {
                 return res.status(404).send("Sản phẩm không tồn tại");
             }
 
-            // Cập nhật số lượng sản phẩm sau khi mua
+            const type = product.type;
+            if (!getVoucher || type !== getVoucher.typeForProduct && getVoucher.typeForProduct !== 'all') {
+                req.flash('error', 'Mã giảm giá không hợp lệ');
+                return res.redirect(`/Product/Buy/  ${_id}`);
+
+            }
+
             const updatedQuantity = product.quanlity - theQuanlity;
             const updatedProduct = await theProduct.Update_product(_id, { quanlity: updatedQuantity });
             if (!updatedProduct) {
@@ -82,23 +90,16 @@ const buy_function = async (req, res) => {
                 return res.status(500).redirect('/Error');
             }
 
-            // Lấy địa chỉ mua hàng đã chọn từ danh sách địa chỉ của người dùng
-           
-
-            // Lấy email của người dùng từ hàm Mg_user.in4User
             const emailForBuyProduct = await Mg_user.in4User(id_user);
             if (!emailForBuyProduct) {
                 console.log('Lỗi hệ thống: Không tìm thấy email của người dùng');
                 return res.status(500).send("Lỗi hệ thống email");
             }
 
-            // Tạo JWT token chứa các thông tin cần thiết
-            const token = jwt.sign({ _id, id_user, name_user, product_name, size, theQuanlity, selectedAddress }, 'secret', { expiresIn: '1h' });
+            const token = jwt.sign({ _id, id_user, name_user, product_name, type, size, theQuanlity, selectedAddress, discount }, 'secret', { expiresIn: '1h' });
 
-            // Tạo URL xác nhận mua hàng
             const confirmationUrl = `${req.protocol}://${req.get('host')}/confirmPurchase/${token}`;
             
-            // Gửi email xác nhận mua hàng
             await confirmEmail.sendEmail(emailForBuyProduct.Email, 'Xác nhận mua hàng', 
             `<!DOCTYPE html>
             <html lang="en">
@@ -119,32 +120,29 @@ const buy_function = async (req, res) => {
             </body>
             </html>`
             );
-
-            // Redirect đến trang thông báo kiểm tra email
+        }
             req.flash('success', 'Vui lòng check Email để xác nhận mua hàng');
             return res.redirect(`/theProduct/${_id}`);
-
         } catch (err) {
-            // Bắt lỗi và in ra thông báo lỗi
             console.log("Lỗi trong buy_function (Controller):", err);
-            res.status(500).redirect('/Error');
+            return res.status(500).redirect('/Error');
         }
     } else {
-        // Nếu session hoặc userData không tồn tại, trả về lỗi Unauthorized
         console.log("Session hoặc userData không tồn tại");
-        res.status(401).send("Unauthorized");
+        return res.status(401).send("Unauthorized");
     }
 };
+
 const confirmProduct = async(req, res) => {
     try{
         const token = req.params.token;
         const getJWT = jwt.verify(token, 'secret');
-        const {_id, id_user, name_user, product_name, size, theQuanlity, selectedAddress} = getJWT;
+        const {_id, id_user, name_user, product_name ,type,size, theQuanlity, selectedAddress, discount} = getJWT;
         if (!selectedAddress) {
             console.log('Lỗi hệ thống: Không thể tìm thấy địa chỉ đã chọn');
             return res.status(400).send("Lỗi hệ thống địa chỉ");
         }
-        const product = await buy_Product(_id, id_user, name_user, product_name, size, theQuanlity, selectedAddress);
+        const product = await Mg_Oder.buy_Product(_id, id_user, name_user, product_name,type ,size, theQuanlity, selectedAddress, discount);
 
         if(!product){
             req.flash('error','Mua Hàng thất bại');
@@ -158,7 +156,7 @@ const confirmProduct = async(req, res) => {
     }catch(err){
             console.log("L��i trong confirmProduct (Controller):", err);
             req.flash('error', "Xác nhận mua hàng thất bại");
-            return res.redirect(`/theProduct/${_id}`);
+            return res.redirect(`/err`);
     
     }
 }
@@ -174,7 +172,7 @@ const functionGetOderProduct = async (req, res) => {
                 return res.status(401).redirect('/Error');
             }
 
-            const theproductOder = await getOderProduct(_id);
+            const theproductOder = await Mg_Oder.getOderProduct(_id);
             if (!theproductOder) {
                 console.log("Lỗi lấy đơn hàng của người dùng");
                 return res.status(404).send("Đơn hàng không tồn tại");
@@ -199,7 +197,7 @@ const your_Product = async (req, res) => {
             console.log("Error: User ID not found");
             return res.status(400).send("User ID not found");
         } else {
-            const theYourProducts = await yourProduct(id_user);
+            const theYourProducts = await Mg_Oder.yourProduct(id_user);
             res.render('yourProduct', { 
                 theYourProducts,
             });
@@ -208,11 +206,65 @@ const your_Product = async (req, res) => {
         console.log("Error in yourProduct (Controller): ", err);
         res.status(500).send("Internal Server Error");
     }
-}
+    }
+const controller_suggested_price = async (req, res) => {
+        try {
+            const priceRange = req.query.priceRange;
+            let min, max;
+    
+            switch (priceRange) {
+                case 'low':
+                    min = 0;
+                    max = 100000;
+                    break;
+                case 'medium':
+                    min = 100000;
+                    max = 200000;
+                    break;
+                case 'high':
+                    min = 200000;
+                    max = 500000;
+                    break;
+                case 'highPlush':
+                    min = 500000;
+                    max = 1000000;
+                    break;
+                case 'highPromax':
+                    min = 1000000;
+                    max = 9999999999999;
+                    break;
+                default:
+                    min = 0;
+                    max = 9999999999999;
+                    break;
+            }
+            const minPrice =  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(min);
+            const maxPrice =  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(max); 
+            const products = await Mg_Oder.get_suggested_price(minPrice, maxPrice);
+            console.log('Min: ', minPrice);
+            console.log('Max: ', maxPrice);
+            if (!products) {
+                res.render('ProductByPrice', {
+                    products: [],
+                    priceRange: priceRange,
+                });
+            } else {
+                res.render('ProductByPrice', {
+                    products: products,
+                    priceRange: priceRange,
+                });
+            }
+        } catch (err) {
+            console.log("Error controller_suggested_price(Controller): ", err);
+            return res.status(500).redirect('/Error');
+        }
+    };
 
-
-module.exports = { buy_function,
-     get_buy, 
-     functionGetOderProduct,
-      your_Product, 
-      confirmProduct };
+module.exports = { 
+    buy_function,
+    get_buy, 
+    functionGetOderProduct,
+    your_Product, 
+    confirmProduct,
+    controller_suggested_price,
+    };

@@ -15,35 +15,26 @@
             <h1>TonShop</h1>
             <nav>
                 <ul>
-                    <div class="header">
                     <li>
-                        <form action="/findType" method="POST">
-                            <select name="findtype" id="findtype" onchange="redirectToProduct()">
-                                <option value="shirt">shirt</option>
-                                <option value="coat">coat</option>
-                                <option value="pants">pants</option>
-                                <option value="hat">hat</option>
-                                <option value="watch">watch</option>
-                                <option value="shoes">shoes</option>
-                                <option value="bag">bag</option>
-                                <option value="outfit">outfit</option>
-                                <option value="dress">dress</option>
+                        <form action="/findType" method="GET">
+                            <select name="type_product" id="findtype" onchange="this.form.submit()">
+                                <option value="shirt">Shirt</option>
+                                <option value="coats">Coats</option>
+                                <option value="pants">Pants</option>
+                                <option value="hat">Hat</option>
+                                <option value="watch">Watch</option>
+                                <option value="shoes">Shoes</option>
+                                <option value="bag">Bag</option>
+                                <option value="outfit">Outfit</option>
+                                <option value="dress">Dress</option>
                             </select>
                         </form>
                     </li>
                     <li><a href="/oderManagement"><i class="fa-solid fa-truck"></i></a></li>
-                </div>
                 </ul>
             </nav>
         </div>
     </header>
-
-    <script>
-        function redirectToProduct() {
-            var selectedType = document.getElementById("findtype").value;
-            window.location.href = "/products/" + selectedType;
-        }
-    </script>
 
     <!-- Main Content -->
     <main>
@@ -56,8 +47,8 @@
 
             <!-- Product Section -->
             <section class="products">
-                    <div class="product-list">
-                    <% products.forEach(product => { %>
+                <div class="product-list">
+                    <% productList.forEach(product => { %>
                         <div class="product">
                             <% if (product.image && product.image.data) { %>
                                 <img src="data:<%= product.image.contentType %>;base64, <%= product.image.data.toString('base64') %>" alt="<%= product.name %>">

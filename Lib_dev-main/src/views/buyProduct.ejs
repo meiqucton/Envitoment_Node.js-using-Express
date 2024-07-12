@@ -26,6 +26,8 @@
                     <label for="product-name">Product Name: </label>
                     <input type="text" id="product-name" value="<%= name %>" readonly>
                     <input type="hidden" name="product_name" value="<%= name %>">
+                    <label for="voucherCode">Voucher code: </label>
+                    <input type="text" name="voucherCode" placeholder="Voucher Code here">
                 </div>
                 <div class="product-field">
                     <label for="product-quantity">Số lượng:</label>
@@ -41,6 +43,7 @@
                         <option value="XXL">XXL</option>
                     </select>
                 </div>
+                
                 <div class="product-field">
                     <% if (!Address || Address.length === 0) { %>
                         <p>Chưa có địa chỉ nào. Vui lòng thêm một địa chỉ!</p>
@@ -61,6 +64,7 @@
                             <% }); %>
                         </div>
                     <% } %>
+
                 </div>
             </div>
             <button type="submit">Mua ngay</button>

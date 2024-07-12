@@ -3,9 +3,9 @@ const router = express.Router();
 
 const { requireLogin } = require('../controllers/authentication');
 const { OpenWeather } = require('../controllers/API_Controllers');
-const { createAccount, get_OTP, logIn, forgot_Password, profileUser, getUser, Address, confirmfogotEmail, changePassword, getStore } = require('../controllers/Mongoo_User');
+const { createAccount, get_OTP, logIn, forgot_Password, profileUser, getUser, Address, confirmfogotEmail, changePassword, getStore, folowStore, createrVouchers} = require('../controllers/Mongoo_User');
 const Product= require('../controllers/Mongoo_Product');
-const { buy_function, get_buy, confirmProduct ,functionGetOderProduct, your_Product} = require('../controllers/Mongoo_Oder');
+const { buy_function, get_buy, confirmProduct ,functionGetOderProduct, your_Product, controller_suggested_price} = require('../controllers/Mongoo_Oder');
 const upload = require('../config/multerConfig');
 
 
@@ -25,6 +25,8 @@ router.post('/Fogot_Pass', forgot_Password);
 router.get('/forgotPass/:token', confirmfogotEmail);
 router.post('/UpdatePasss/:Email', changePassword);
 // Profile Route
+router.get('/CreteVoucher', requireLogin, (req, res) => res.render('VocherPage'))
+router.post('/CreateVoucher', requireLogin, createrVouchers);
 router.get('/addressUser',requireLogin, getUser )
 router.get('/Profile', requireLogin, profileUser);
 router.post('/updateAddress/:_id', requireLogin, Address);
@@ -37,10 +39,12 @@ router.post('/Weather', requireLogin, OpenWeather);
 // Product Routes
 router.get('/addProduct',  requireLogin, (req, res) => res.render('addProduct'));
 router.post('/addProduct',upload.single('image') ,requireLogin, Product.AddProducts);
-router.get('/products/:type', requireLogin, Product.findTypes);
-router.get('/theProduct/:_id', requireLogin, Product.in4_Products);
+router.get('/theProduct/:_id', requireLogin, Product.in4_Products, );
 
 // Shop Routes
+router.post('/followStore/:userId', requireLogin, folowStore);
+router.get('/findType', Product.Find_type_PRODUCT);
+router.get('/products', controller_suggested_price);
 router.get('/Store/:userId', requireLogin, getStore)
 router.post('/Responsice/:_id', requireLogin, Product.Responsice_Sales);
 router.get('/SaleProduct/:_id', requireLogin, Product.getSale);
@@ -49,12 +53,11 @@ router.get('/oderManagement', requireLogin, your_Product);
 router.get('/oderManagement/:_id', requireLogin, functionGetOderProduct);
 router.get('/wareHouses',Product.wareHouses );
 router.get('/yourStore', requireLogin, (req, res) => res.render('yourStore'));
-router.get('/Shop', requireLogin, Product.listProducts);
-router.get('/Shop', requireLogin, (req, res) => res.render('ShopPage'));
+router.get('/Shop', requireLogin, Product.listProducts, );
 //Customer Routes
 router.get('/confirmPurchase/:token', requireLogin,confirmProduct);
 router.post('/buyProduct/:_id',requireLogin, buy_function);
-router.get('/Product/Buy/:_id',requireLogin, get_buy);
+router.get('/Product/Buy/:_id',requireLogin, get_buy, );
 // Product function 
 router.get('/updateProduct/:_id', requireLogin, Product.get_a_Product);
 router.get('/Product/Rate/:_id', requireLogin, Product.getRate);

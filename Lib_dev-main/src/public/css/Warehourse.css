@@ -11,7 +11,6 @@ body, html {
     margin-top: 20px;
 }
 
-
 .warehouse-list {
     display: flex;
     flex-wrap: wrap;
@@ -30,6 +29,7 @@ body, html {
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease-in-out;
+    position: relative; /* Để chứa sale-badge */
 }
 
 .warehouse-card:hover {
@@ -63,7 +63,7 @@ body, html {
     justify-content: space-between;
 }
 
-.update-button, .delete-button, .oder-management-button, .sale-button {
+.update-button, .delete-button, .order-management-button, .sale-button {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -79,12 +79,15 @@ body, html {
 .delete-button {
     background-color: #9da1b6;
 }
-.sale-button{
+
+.sale-button {
     background-color: #9da1b6;
 }
-.oder-management-button{
+
+.order-management-button {
     background-color: #9da1b6;
 }
+
 .update-button:hover {
     background-color: #45a049;
 }
@@ -92,10 +95,25 @@ body, html {
 .delete-button:hover {
     background-color: #e53935;
 }
-.sale-button:hover{
+
+.sale-button:hover {
     background-color: #dede26;
 }
-.oder-management-button:hover{
-    background-color: #f16823;
 
+.order-management-button:hover {
+    background-color: #f16823;
+}
+
+.sale-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #e74c3c;
+    color: #fff;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Thêm bóng đổ */
+    transform: rotate(-10deg); /* Xoay nhãn sale để nổi bật hơn */
 }

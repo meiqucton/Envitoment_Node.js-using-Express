@@ -184,3 +184,11 @@ body {
 .command-to-cart-button:hover {
     background-color: #ff6347;
 }
+.sale-badge {
+    display: inline-block;
+    background-color: rgb(219, 37, 37);
+    color: white;
+    padding: 2px 5px;
+    margin-left: 10px;
+    border-radius: 3px;
+}
