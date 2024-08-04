@@ -1,22 +1,26 @@
-
 require('dotenv').config();
 const express = require('express');
-const app = express();
-
+const session = require('express-session');
+const flash = require('connect-flash');
 const ViewEnging = require('./controllers/viewEnging');
 const router = require('./router/web');
-const {TestMongoo, TestAPI} = require('./controllers/testConnect');
+const { TestMongoo, TestAPI } = require('./controllers/testConnect');
 
-const port = process.env.PORT || 4212;
-const hostname = process.env.HOST_NAME;
+const app = express();
 
+// Call ViewEnging to set up middleware and socket.io
 ViewEnging(app);
+
+// Routes
 app.use(router);
+
+// Database connection test
 TestMongoo();
 
-// Để gọi hàm Test_conect khi server khởi động
-app.listen(port, () => {
+// Start server
+const port = process.env.PORT || 4212;
+const hostname = process.env.HOST_NAME;
+const server = app.get('socketio').httpServer;
+server.listen(port, () => {
     console.log(`Example app listening on http://${hostname}:${port}`);
 });
-
-

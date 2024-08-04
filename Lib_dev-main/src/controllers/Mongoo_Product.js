@@ -1,11 +1,12 @@
-const theProduct = require('../model/Mongodb_Product');
+const theProduct = require('../model/mongodb_Product');
+const User_model = require('../model/Mongodb_User');
 const fs = require('fs');
 const path = require('path');
 
 const AddProducts = async (req, res, next) => {
     const { name, thePrice, type, describe, quanlity } = req.body;
     const image = req.file; // Lấy file ảnh từ request
-
+    let sales = 0;
     try {
         const userId = req.session.userData._id;
         const userName = req.session.userData.UserName;
@@ -35,6 +36,7 @@ const AddProducts = async (req, res, next) => {
             userName, 
             userId, 
             quanlity,
+            sales,
             image: {
                 data: imageData,
                 contentType: image.mimetype
@@ -371,13 +373,83 @@ const Responsice_Sales = async(req, res) => {
         return res.status(500).redirect('/Error');  
     }
 }
+const flash_deals = async(req, res) => {
+    try {
+        const flashDeal = await theProduct.flashDeal();
+        if (flashDeal) {
+            res.render('flash_deal', {
+                flashDeal
+            });
+        } else {
+            console.log("Lỗi flashDeal");
+            req.flash('error', 'Lỗi flashDeal');
+            return res.redirect('/products');
+        }
+    } catch (err) {
+        console.log("Lỗi trong flash_deal(Controller): ", err);
+        return res.status(500).redirect('/Error');
+    }
+}
+const bestSlell = async(req, res) => {
+    try{
+        const bestSale = await theProduct.BestSell();
+        if(bestSale){
+            res.render('bestSeller', {
+                bestSale
+            });
+        }else{
+            console.log("L��i getBestSell");
+            req.flash('error', 'L��i getBestSell');
+            return res.redirect('/products');
+        }
+    }catch(err){
+        console.log("Lỗi mục bestSale");
+        return res.status(500).redirect('/Error');
+    }
+}
+const Product_bestSell_byShop = async(req, res) => {
+    try{
+        const {userId} = req.params;
+            const bestSale = await theProduct.bestSale_forShop(userId);
+            if(bestSale){
+                res.render('bestSale_Store', {
+                    bestSale
+                });
+            }else{
+                console.log("L��i getBestSell");
+                req.flash('error', 'L��i getBestSell');
+                return res.redirect('/products');
+            }
+        }catch(err){
+            console.log("Lỗi mục bestSale");
+            return res.status(500).redirect('/Error');
+    
+    }
+}
+const findProduct = async(req, res) => {
+    try{
+        const {search} = req.query;
+        if(!search){
+            console.log("L��i tìm kiếm sản phẩm");
+            req.flash('error', 'Vui lòng nhập tên sản phẩm');
+            return res.redirect('/shop');
+        }
+        const findProduct = await theProduct.findProduct(search);
+        res.render('findProduct', {
+            findProduct,
+        });
+    }catch(err){
+        console.log("Error in findProduct(Controller): ", err);
+        return res.status(500).redirect('/Error');
+    }
+}
 module.exports = {
     listProducts, 
     AddProducts,
     Find_type_PRODUCT,
     in4_Products, 
     rateTheProduct, 
-    getRate , 
+    getRate, 
     wareHouses, 
     Del_products, 
     get_a_Product, 
@@ -385,4 +457,8 @@ module.exports = {
     Sale_Product, 
     getSale,
     Responsice_Sales,
+    flash_deals,
+    bestSlell,
+    Product_bestSell_byShop,
+    findProduct,
 };

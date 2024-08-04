@@ -210,7 +210,44 @@ const checkRate = async (user_id, product_id) => {
         return false; 
     }
 }
-
+const flashDeal = async () => {
+    try {
+        const db = client.db(process.env.NAME_DATABASE);
+        const products = await db.collection('Products').find({ Sale:{ $exists: true } }).toArray();
+        // exists:  Là điều kiện trong truy vấn để lấy các sản phẩm có trường Sale đã được định nghĩa.
+        return products;
+    } catch (err) {
+        console.log("Lỗi trong flashDeal", err);
+        throw err; 
+    }
+}
+const BestSell = async()=> {
+    try{
+        const db = client.db(process.env.NAME_DATABASE);
+        return await db.collection('Products').find({ sales: { $exists: true } }).toArray();
+    }catch(err){
+        console.log("Lỗi BestSell(bestSlell)");
+    }
+}
+const bestSale_forShop = async(_id) => {
+    try {
+        const db = client.db(process.env.NAME_DATABASE);
+        const products = await db.collection('Products').find({userId: _id, sales: { $exists: true } }).toArray();
+        return products;
+    } catch (err) {
+        console.log("L��i bestSale_forShop", err);
+        throw err; 
+    }
+}
+const findProduct = async(search) => {
+    try{
+        const db = client.db(process.env.NAME_DATABASE);
+        return await db.collection('Products').find({ name: { $regex: search, $options: 'i' } }).toArray(); 
+    }catch(err){
+        console.log("L��i findProduct", err);
+        throw err;
+    }
+}
 module.exports = {
     AddProduct,
     listProduct,
@@ -224,4 +261,8 @@ module.exports = {
     sale_product,
     Responsice_Sale,
     checkRate,
+    flashDeal,
+    BestSell,
+    bestSale_forShop,
+    findProduct,
 };

@@ -117,6 +117,7 @@ const createrVoucher = async(Voucher) => {
         return false;
     }
 }
+
 const getVoucher = async(voucherCode) => {
     try{
         return await client.db(process.env.NAME_DATABASE).collection('Vocher').findOne({codeVoucher: voucherCode});
@@ -125,11 +126,85 @@ const getVoucher = async(voucherCode) => {
         return false;
     }
 }
-const updateVoucher = async(Id_voucher, quanlityVoucher) => {
+const getTicket_Voucher = async (_id) => {
+    try {
+        const voucher_Id = new ObjectId(_id);
+        return await client.db(process.env.NAME_DATABASE).collection('Vocher').findOne({_id: voucher_Id});
+    } catch (err) {
+        console.log("Error in getTicket_Voucher:", err);
+        return false;
+    }
+};
+
+const getVouCherCilent = async (user_Id) => {
     try{
-        const voucher = await client.db(process.env.NAME_DATABASE).collection('Voucher').updateOne({_id: Id_voucher}, {$set: {useQuantity: quanlityVoucher }})
+        const query = { user_Id };
+        return await client.db(process.env.NAME_DATABASE).collection('Vocher').find(query).toArray();
     }catch(err){
-        console.log("loi updateVoucher", err);
+        console.log("loi getVoucher Strore", err);
+        return false;
+    }
+};
+//------
+const addTicketVoucher = async (userId, ticket_Voucher, discount, type, end) => {
+    try {
+        const user_Id = new ObjectId(userId);
+        const updatedUser = await client.db(process.env.NAME_DATABASE).collection('User').updateOne(
+            {_id: user_Id}, {
+            $push: {
+                Voucher: {
+                    Voucher_id: ticket_Voucher, 
+                    type: type,
+                    discount: discount,
+                    dateEnd: end,
+                }
+            },
+        });
+        return updatedUser.modifiedCount > 0;
+    } catch (err) {
+        console.log("Error in addTicketVoucher:", err);
+        return false;
+    }
+};
+const listUsers = async() =>  {
+    try {
+        await client.connect();
+        return await client.db(process.env.NAME_DATABASE).collection('User').find().toArray();
+    } catch (err) {
+        console.log("Error in listUser:", err);
+        return false;
+    }
+}
+
+const chatBox = async(roomChat) =>  {
+    try {
+        await client.connect();
+        const room_Chat = await client.db(process.env.NAME_DATABASE).collection('dbChat').insertOne(roomChat);
+        return room_Chat.insertedId;
+    } catch (err) {
+        console.log("Error in insertChat:", err);
+        return false;
+    }
+}
+const updateChat = async(roomId, user_Id ,message) => {
+    try{
+        await client.connect();
+        const updateChat = await client.db(process.env.NAME_DATABASE).collection('dbChat').updateOne(
+            {_id: roomId},{
+                $push:{
+                    message: {
+                        user_Id,
+                        message,
+                        createdAt: new Date(),
+                    }
+                }
+            }
+            
+
+        )
+        return updateChat.matchedCount > 0;
+    }catch(err){
+        console.log("loi updateChat", err);
         return false;
     }
 }
@@ -145,4 +220,10 @@ module.exports = {
     folow_Store,
     createrVoucher, 
     getVoucher,
-};
+    getVouCherCilent,
+    addTicketVoucher,
+    getTicket_Voucher,
+    listUsers,
+    chatBox,
+    updateChat,
+ };

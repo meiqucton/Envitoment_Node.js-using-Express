@@ -1,27 +1,24 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Get the modal element
-    var modal = document.getElementById("myModal");
+document.addEventListener('DOMContentLoaded', () => {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const target = document.querySelector(button.dataset.target);
+            
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            button.classList.add('active');
+            target.classList.add('active');
+        });
+    });
 
-    // Get the button that opens the modal
-    var btn = document.getElementById("buyButton");
-
-    // Get the <span> element that closes the modal
-    var span = document.getElementsByClassName("close")[0];
-
-    // When the user clicks the button, open the modal 
-    btn.onclick = function() {
-        modal.style.display = "block";
-    }
-
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
-
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
+    // Activate the first tab by default
+    if (tabButtons.length > 0) {
+        tabButtons[0].classList.add('active');
+        if (tabContents.length > 0) {
+            tabContents[0].classList.add('active');
         }
     }
 });

@@ -21,13 +21,56 @@
     <div class="container">
         <form action="/buyProduct/<%= _id %>" method="post">
             <h1>Mua Hàng</h1>
+            <div class="tab-container">
+                <div class="tab-button" data-target="#voucher-tab">Voucher</div>
+                <div class="tab-button" data-target="#address-tab">Address</div>
+            </div>
+            <div id="voucher-tab" class="tab-content">
+                <% if (!Voucher || !Array.isArray(Voucher) || Voucher.length === 0) { %>
+                    <p>Chưa có Voucher nào</p>
+                <% } else { %>
+                    <div class="address-list">
+                        <% Voucher.forEach(function(voucher, index) { %>
+                            <div class="address">
+                                <input type="radio" id="voucher<%= index %>" name="voucher_index" value="<%= index %>">
+                                <label for="voucher<%= index %>">
+                                    <i class="fas fa-gift"></i>
+                                    <p>ID Voucher: <%= voucher.Voucher_id %></p>
+                                    <p>Loại sản phẩm áp dụng: <%= voucher.type || 'N/A' %></p>
+                                    <p>Giá trị: <%= voucher.discount || 'N/A' %></p>
+                                    <p>Hết hạn: <%= voucher.dateEnd || 'N/A' %></p>
+                                </label>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } %>
+            </div>
+            <div id="address-tab" class="tab-content">
+                <% if (!Address || Address.length === 0) { %>
+                    <p>Chưa có địa chỉ nào. Vui lòng thêm một địa chỉ!</p>
+                <% } else { %>
+                    <div class="address-list">
+                        <% Address.forEach(function(address, index) { %>
+                            <div class="address">
+                                <input type="radio" id="address<%= index %>" name="address_index" value="<%= index %>" required>
+                                <label for="address<%= index %>">
+                                    <i class="fas fa-user"></i>
+                                    <p>Quốc gia: <%= address.country || 'N/A' %></p>
+                                    <p>Thành phố: <%= address.city || 'N/A' %></p>
+                                    <p>Tỉnh: <%= address.conscious || 'N/A' %></p>
+                                    <p>Tên đường: <%= address.stressName || 'N/A' %></p>
+                                    <p>Số điện thoại: <%= address.phoneNumber || 'N/A' %></p>
+                                </label>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } %>
+            </div>
             <div class="product-info">
                 <div class="product-field">
                     <label for="product-name">Product Name: </label>
                     <input type="text" id="product-name" value="<%= name %>" readonly>
                     <input type="hidden" name="product_name" value="<%= name %>">
-                    <label for="voucherCode">Voucher code: </label>
-                    <input type="text" name="voucherCode" placeholder="Voucher Code here">
                 </div>
                 <div class="product-field">
                     <label for="product-quantity">Số lượng:</label>
@@ -42,29 +85,6 @@
                         <option value="XL">XL</option>
                         <option value="XXL">XXL</option>
                     </select>
-                </div>
-                
-                <div class="product-field">
-                    <% if (!Address || Address.length === 0) { %>
-                        <p>Chưa có địa chỉ nào. Vui lòng thêm một địa chỉ!</p>
-                    <% } else { %>
-                        <div class="address-list">
-                            <% Address.forEach(function(address, index) { %>
-                                <div class="address">
-                                    <input type="radio" id="address<%= index %>" name="address_index" value="<%= index %>" required>
-                                    <label for="address<%= index %>">
-                                        <i class="fas fa-user"></i>
-                                        <p>Quốc gia: <%= address.country || 'N/A' %></p>
-                                        <p>Thành phố: <%= address.city || 'N/A' %></p>
-                                        <p>Tỉnh: <%= address.conscious || 'N/A' %></p>
-                                        <p>Tên đường: <%= address.stressName || 'N/A' %></p>
-                                        <p>Số điện thoại: <%= address.phoneNumber || 'N/A' %></p>
-                                    </label>
-                                   </div>
-                            <% }); %>
-                        </div>
-                    <% } %>
-
                 </div>
             </div>
             <button type="submit">Mua ngay</button>

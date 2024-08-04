@@ -31,7 +31,9 @@
             </div>
             <div class="product-details">
                 <h1><%= name %></h1>
-                <h2><%= userName %></h2>
+                <form action ="/Store/<%= userId %>" method="get" >
+                    <button type="submit"><%= userName %></button>
+                </form>
                 <div class="flowFunction">
                     <form action="/followStore/<%= userId %>" method="post">
                         <button type="submit" class="follow-button"><i class="fa-solid fa-heart"></i></button>
@@ -57,6 +59,9 @@
                 </form>
                 <form action="/Product/Rate/<%= _id %>" method="get">
                     <button class="command-to-cart-button"><i class="fa-solid fa-star"></i></button>
+                </form>
+                <form action="/feedback/<%= _id %>" method="get">
+                    <button class="command-to-cart-button"><i class="fa-solid fa-comment-dots"></i></button>
                 </form>
             </div>
             </form>

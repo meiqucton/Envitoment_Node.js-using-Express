@@ -1,5 +1,5 @@
 const  Mg_Oder = require('../model/mongodb_Oder');
-const theProduct = require('../model/Mongodb_Product');
+const Mg_product = require('../model/mongodb_Product');
 const Mg_user = require('../model/Mongodb_User');
 const confirmEmail = require('../config/Send_Mail');
 
@@ -13,6 +13,7 @@ const get_buy = async (req, res, next) => {
     if (req.session && req.session.userData) {
         const user_Id = req.session.userData._id;
         const address = req.session.userData.address;
+        const voucher = req.session.userData.Voucher;
 
         try {
             if (!user_Id) {
@@ -22,16 +23,15 @@ const get_buy = async (req, res, next) => {
 
             if (!address) {
                 req.flash('error', 'Vui lòng cập nhật địa chỉ');
-                return res.redirect(`/theProduct/${_id}`);
+                return res.redirect(`/Mg_product/${_id}`);
             }
-
-            const product = await theProduct.get_Product(_id);
+            const product = await Mg_product.in4Product(_id);
             if (!product) {
                 return res.status(404).send("Sản phẩm không tồn tại");
             } else {
                 if (isNaN(product.quanlity)) {
                     req.flash('error', 'Sản phẩm đã hết hàng');
-                    return res.redirect(`/theProduct/${_id}`);
+                    return res.redirect(`/Mg_product/${_id}`);
                 }
                 res.render('buyProduct', {
                     _id: product._id,
@@ -39,6 +39,7 @@ const get_buy = async (req, res, next) => {
                     quanlity: product.quanlity,
                     type: product.type,
                     Address: address,
+                    Voucher: voucher,
                 });
             }
         } catch (err) {
@@ -49,42 +50,46 @@ const get_buy = async (req, res, next) => {
         console.log("Session hoặc userData không tồn tại");
         res.status(401).send("Unauthorized");
     }
-};const buy_function = async (req, res) => {
+};
+const buy_function = async (req, res) => {
     if (req.session && req.session.userData) {
         try {
             const _id = req.params._id;
             const id_user = req.session.userData._id;
             const name_user = req.session.userData.UserName;
             const addresses = req.session.userData.address;
+            const voucher = req.session.userData.Voucher;
             let discount = 0;
-            const { size, theQuanlity, product_name, address_index, voucherCode } = req.body;
+            const { size, theQuanlity, product_name, address_index, voucher_index } = req.body;
             const selectedAddress = addresses[address_index];
+            const selecrtVoucher = voucher[voucher_index];
+
             if (!id_user || !name_user) {
                 console.log('Lỗi hệ thống: Không xác nhận được người dùng mua');
                 return res.status(401).redirect('/Error');
             }
-            
-            if (voucherCode && voucherCode.trim() !== '') { // Check if voucherCode is provided
-                const getVoucher = await Mg_user.getVoucher(voucherCode);
-                if (getVoucher && getVoucher.Discount) {
-                    discount = parseInt(getVoucher.Discount);
-                
-            }
 
-            const product = await theProduct.get_Product(_id);
+            const product = await Mg_product.get_Product(_id);
             if (!product) {
                 return res.status(404).send("Sản phẩm không tồn tại");
             }
 
             const type = product.type;
-            if (!getVoucher || type !== getVoucher.typeForProduct && getVoucher.typeForProduct !== 'all') {
-                req.flash('error', 'Mã giảm giá không hợp lệ');
-                return res.redirect(`/Product/Buy/  ${_id}`);
 
+            if (selecrtVoucher) { 
+               
+                 
+                if (type !== selecrtVoucher.type && selecrtVoucher.type !== 'all') {
+                        req.flash('error', 'Mã giảm giá không hợp lệ với loại sản phẩm này');
+                        return res.redirect(`/Product/Buy/${_id}`);
+                }
+                discount = selecrtVoucher.discount;
+            } else {
+                discount = 0;
             }
-
+            
             const updatedQuantity = product.quanlity - theQuanlity;
-            const updatedProduct = await theProduct.Update_product(_id, { quanlity: updatedQuantity });
+            const updatedProduct = await Mg_product.Update_product(_id, { quanlity: updatedQuantity });
             if (!updatedProduct) {
                 console.log('Lỗi hệ thống: Không thể cập nhật số lượng sản phẩm');
                 return res.status(500).redirect('/Error');
@@ -120,9 +125,9 @@ const get_buy = async (req, res, next) => {
             </body>
             </html>`
             );
-        }
+
             req.flash('success', 'Vui lòng check Email để xác nhận mua hàng');
-            return res.redirect(`/theProduct/${_id}`);
+            return res.redirect(`/Mg_product/${_id}`);
         } catch (err) {
             console.log("Lỗi trong buy_function (Controller):", err);
             return res.status(500).redirect('/Error');
@@ -143,15 +148,24 @@ const confirmProduct = async(req, res) => {
             return res.status(400).send("Lỗi hệ thống địa chỉ");
         }
         const product = await Mg_Oder.buy_Product(_id, id_user, name_user, product_name,type ,size, theQuanlity, selectedAddress, discount);
-
+        const getIn4_Product = await Mg_product.get_Product(_id);
+        const UP_Quanlity = getIn4_Product.quanlity - theQuanlity;
+        const updateSales = getIn4_Product.sales + theQuanlity;
+        console.log('cập nhật danh sách bán chạy thành công: ', updateSales);
+        const updatedQuantity = await Mg_product.Update_product(_id, {quanlity: UP_Quanlity, sales: updateSales}, );
+        if(!updatedQuantity){
+            req.flash('error','Cập nhật sản phẩm thất bại');
+            return res.redirect(`/Mg_product/${_id}`);
+        }
+        console.log('Cập nhật thành công');
         if(!product){
             req.flash('error','Mua Hàng thất bại');
-            return res.redirect(`/theProduct/${_id}`);
+            return res.redirect(`/Mg_product/${_id}`);
         }
         else{
             
             req.flash('success', "mua hàng thành công");
-            return res.redirect(`/theProduct/${_id}`);
+            return res.redirect(`/Mg_product/${_id}`);
         }
     }catch(err){
             console.log("L��i trong confirmProduct (Controller):", err);
@@ -259,7 +273,7 @@ const controller_suggested_price = async (req, res) => {
             return res.status(500).redirect('/Error');
         }
     };
-
+    
 module.exports = { 
     buy_function,
     get_buy, 
@@ -267,4 +281,5 @@ module.exports = {
     your_Product, 
     confirmProduct,
     controller_suggested_price,
+    
     };

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TonShop</title>
+    <link href="/css/notifacation.css " type="text/css" rel="stylesheet">
+    <link href="/css/navagativeBarmini.css" type="text/css" rel="stylesheet">
+    <link href="/css/ShopPage.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <% if (typeof messages !== 'undefined' && messages.error) { %>
+            <div class="notification error-notification">
+                <%= messages.error %>
+            </div>
+        <% } %>
+        <% if (typeof messages !== 'undefined' && messages.success) { %>
+            <div class="notification success-notification">
+                <%= messages.success %>
+            </div>
+        <% } %>
+        <div class="container">
+            <h1>TonShop</h1>
+            <nav>
+                <ul>
+                    <div class="header">
+                    <li>
+                        <form id="product_Type_form"action="/findType" method="get">
+                            <label for="type_product">Loại sản phẩm:</label>  
+                            <select name="type_product" id="type_product" onchange="document.getElementById('product_Type_form').submit()">
+                                <option value="shirt">shirt</option>
+                                <option value="coat">coat</option>
+                                <option value="pants">pants</option>
+                                <option value="hat">hat</option>
+                                <option value="watch">watch</option>
+                                <option value="shoes">shoes</option>
+                                <option value="bag">bag</option>
+                                <option value="outfit">outfit</option>
+                                <option value="dress">dress</option>
+                            </select>
+                        </form>
+                    </li>
+                    <li><a href="/oderManagement"><i class="fa-solid fa-truck"></i></a></li>
+                </div>
+
+
+                </ul>
+            </nav>
+            <form action="/search" method ="get">
+                <input type="text" name="search" placeholder="Search products...">
+                <button type="submit"><i class="fa-solid fa-search"></i></button>
+            </form>
+            <form action="/FlashDeal" method="get">
+                <button type="submit" class="flash-deal-button"><i class="fa-solid fa-flashlight"></i></button>
+            </form>
+            <form action="/BestSale" method="get">
+                <button type="submit" class="flash-deal-button"><i class="fa-solid fa-flashlight"></i> bestSell</button>
+            </form>
+            <div class="suggest_price">
+             <form id="priceFilterForm" action="/products" method="GET">
+                <label for="priceRange">Filter by price:</label>
+                <select name="priceRange" id="priceRange" onchange="document.getElementById('priceFilterForm').submit()">
+                    <option value="all">All</option>
+                    <option value="low">0₫ - 100.000₫</option>
+                    <option value="medium">100.000₫ - 200.000₫</option>
+                    <option value="high">200.000₫ - 500.000₫</option>
+                    <option value="highPlush">500.000₫ - 1.000.000₫</option>
+                    <option value="highPromax">> 1.000.000₫</option>
+                </select>
+            </form>
+</form>
+
+            </div>
+        </div>
+    </header>
+
+  
+ 
+    <main>
+        <div class="container">
+        
+            <section class="products">
+                <h2>Sản Phẩm Mới Nhất</h2>
+                <div class="product-list">
+                    <% findProduct.forEach(product => { %>
+                        <div class="product">
+                            <% if (product.Sale) { %>
+                                <div class="sale-badge"><%= product.Sale %>%</div>
+                            <% } %>
+                            <% if (product.image && product.image.data) { %>
+                                <img src="data:<%= product.image.contentType %>;base64,<%= product.image.data.toString('base64') %>" alt="<%= product.name %>">
+                            <% } else { %>
+                                <img src="/default-placeholder.jpg" alt="Default Image">
+                            <% } %>
+                            <h3><%= product.name %></h3>
+                            <% if (product.original_price) { %>
+                                <p><s><%= product.original_price %></s> <%= product.price %>(VND)</p>
+                            <% } else { %>
+                                <p><%= product.price %>(VND)</p>
+                            <% } %>
+                            <form action="/theProduct/<%= product._id %>" method="get">
+                                <button type="submit">Thông tin sản phẩm</button>
+                            </form>
+                        </div>
+                    <% }); %>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 TonShop. All Rights Reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

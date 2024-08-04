@@ -1,8 +1,9 @@
-const { checkEmail, register, Login, forgotPassword, in4User, updateAdress, updatePassword, folow_Store, createrVoucher} = require('../model/Mongodb_User');
-const theProduct = require('../model/Mongodb_Product');
+const User= require('../model/Mongodb_User');
+const theProduct = require('../model/mongodb_Product');
 const confirmEmail = require('../config/Send_Mail');
 const otpGenerator = require('otp-generator');
 const jwt = require('jsonwebtoken');
+const { errorMonitor } = require('nodemailer/lib/xoauth2');
 
 let otp;
 const createAccount = async (req, res) => {
@@ -34,7 +35,7 @@ const createAccount = async (req, res) => {
         }
 
        
-        const emailExists = await checkEmail(Email);
+        const emailExists = await User.checkEmail(Email);
         if (emailExists) {
             req.flash('error', 'Email đã tồn tại');
             return res.redirect('/');
@@ -103,7 +104,7 @@ const get_OTP = async (req, res) => {
             delete req.session.otp;
 
             
-            await register({ UserName, Password, Email, BirthDay });
+            await User.register({ UserName, Password, Email, BirthDay });
             req.flash('success', 'Tạo tài khoản thành công');
             return res.redirect('/'); 
         } else {
@@ -126,7 +127,7 @@ const logIn = async (req, res) => {
             return res.redirect('/');
         }
 
-        const userData = await Login(Email, Password);
+        const userData = await User.Login(Email, Password);
 
         if (userData) {
             req.session.userData = userData;
@@ -151,7 +152,7 @@ const forgot_Password = async (req, res) => {
             return res.redirect('/forgotPass');
         }
 
-        const user = await forgotPassword(Email);
+        const user = await User.forgotPassword(Email);
         if(!user){
             req.flash('error', 'Email không tồn tại');
             return res.redirect('/FogotPass');
@@ -193,7 +194,7 @@ const confirmfogotEmail = async(req, res) => {
             req.flash('error', 'Token không Hợp lệ');
             return res.redirect('/');
         }
-        const user = await forgotPassword(Email);
+        const user = await User.forgotPassword(Email);
         if(!user){
             req.flash('error', 'Email không tồn tại');
             return res.redirect('/');
@@ -216,7 +217,7 @@ const getUser = async (req, res) => {
         const _id = req.session.userData._id;
         const Name = req.session.userData.UserName;
 
-        const user = await in4User(_id);
+        const user = await User.in4User(_id);
         if(!user){
             console.log('Không tìm thấy máy chủ của người dùng ở phần Controller(getUser)');
             return res.status(404).redirect('/Error');
@@ -242,12 +243,12 @@ const changePassword = async (req, res) => {
     try{
         const {Email} = req.params;
         const {password} = req.body;
-        const user = await forgotPassword(Email);
+        const user = await User.forgotPassword(Email);
         if(!user){
             req.flash('error', 'Email không tồn tại');
             return res.redirect('/');
         }
-        const Changed = await updatePassword(Email, password);
+        const Changed = await User.updatePassword(Email, password);
         if(!Changed){
             console.log('Không thể thay đ��i mật khẩu');
             req.flash('error', 'Mật khẩu không thay đ��i');
@@ -266,7 +267,7 @@ const profileUser = async (req, res) => {
 
         
         const _id = req.session.userData._id;
-        const user = await in4User(_id);
+        const user = await User.in4User(_id);
         
         if (!user) {
             req.flash('error', 'Lỗi xác nhận ngừoi dùng ');
@@ -297,7 +298,7 @@ const Address = async(req, res) => {
         if(Address ){
 
         }
-        const productUpdated = await updateAdress(_id, country, city, conscious, stressName, phoneNumber,);
+        const productUpdated = await User.updateAdress(_id, country, city, conscious, stressName, phoneNumber,);
         if(!productUpdated){
             console.log('Cập nhật thông tin người dùng thất bại');
             req.flash('Update address is notsuccessfully');
@@ -313,29 +314,33 @@ const Address = async(req, res) => {
         req.flash('error', 'L��i máy chủ nội bộ khi cập nhật thông tin người dùng');
         return res.status(500).redirect('/Error');
     }       
-};
-const getStore = async(req, res) => {
+};const getStore = async (req, res) => {
     const { userId } = req.params;
-    const user_Id = req.session.userData._id; 
-    try{
-        if(!user_Id){
-            req.flash('error','Vui lòng đăng nhập trước khi xem sản phẩm');
-            console.log('Không tìm thấy máy chủ của người dùng ở phần Controller(getStore)');
-            return res.status(404).redirect('/');   
-        }
+    try {
+        console.log('userId', userId);
         const getStore = await theProduct.wareHouse(userId);
-        if(!getStore){
-            req.flash('error', 'Không tìm thấy cửa hàng này');
-            console.log('Không tìm thấy cửa hàng này');
-            return res.redirect(`/theProduct/${_id}`);
+        const getVoucher = await User.getVouCherCilent(userId);
+
+        if (!getStore) {
+            req.flash('error', 'Cửa hàng này ko còn tồn tại nữa');
+            return res.status(404).redirect('/shop');
         }
+
         res.render('storePage', {
             getTheStore: getStore,
+            userId: userId,
+            voucher: getVoucher,
         });
-    }catch(err){
+    } catch (err) {
         console.log('Lỗi getStore: ' + err);
-    }   
-}
+        req.flash('error', 'Đã xảy ra lỗi khi lấy thông tin cửa hàng');
+        res.redirect('/');
+    }
+};
+
+
+
+
 const folowStore = async (req, res) => {
     try {
         const _id = req.params.id;
@@ -344,12 +349,12 @@ const folowStore = async (req, res) => {
 
         if (!user_Id) {
             req.flash('error', 'Vui lòng đăng nhập trước khi theo dõi cửa hàng');
-            console.log('Không tìm thấy máy chủ của người dùng ở phần Controller(folow_Store)');
+            console.log('Không tìm thấy máy chủ của người dùng ở phần Controller(User.folow_Store)');
             return res.status(404).redirect('/');
         }
-        const folow = await folow_Store(user_Id, storeId);
+        const folow = await User.folow_Store(user_Id, storeId);
 
-        const checkFollow = await in4User(user_Id);
+        const checkFollow = await User.in4User(user_Id);
         const checkFollowLast = checkFollow.follow_store.map(store => store.id_store);
 
         if (checkFollowLast.includes(storeId)) {
@@ -366,24 +371,23 @@ const folowStore = async (req, res) => {
             throw new Error('Không thể theo dõi cửa hàng');
         }
     } catch (err) {
-        console.log('Lỗi folow_Store: ' + err);
+        console.log('Lỗi User.folow_Store: ' + err);
         req.flash('error', 'Lỗi máy chủ nội bộ khi theo dõi cửa hàng');
         return res.status(500).redirect('/');
     }
 };
-
 const createrVouchers = async (req, res) => {
     try{
         const user_Id = req.session.userData._id;
         const {codeVoucher, typeForProduct ,Discount, Expirationdate, useQuantity} = req.body;
         if(!user_Id){
             req.flash('error', 'Vui lòng đăng nhập trước khi tạo mã giảm giá');
-            console.log('Không tìm thấy máy chủ của người dùng ở phần Controller(createrVouchers)');
+            console.log('Không tìm thấy máy chủ của người dùng ở phần Controller(User.createrVouchers)');
             return res.status(404).redirect('/');
         }
       
         const Voucher = {user_Id, codeVoucher, typeForProduct ,Discount, Expirationdate, useQuantity};
-        const createVoucher = await createrVoucher(Voucher);
+        const createVoucher = await User.createrVoucher(Voucher);
         if(!createVoucher){
             console.log('Tạo mã giảm giá thất bại');
             req.flash('error', 'Tạo mã giảm giá thất bại');
@@ -395,11 +399,182 @@ const createrVouchers = async (req, res) => {
         }
     }
     catch(error){
-        console.log('L��i createrVouchers: '+ error);
+        console.log('L��i User.createrVouchers: '+ error);
         req.flash('error', 'Loii máy chủ nội bộ khi tạo mã giảm giá');
         return res.status(500).redirect('/');
     }
 };
+const getTicketVoucher = async (req, res) => {
+    try {
+        const user_Id = req.session.userData._id;
+        const { _id } = req.params;
+
+        if (!user_Id) {
+            req.flash('error', 'Vui lòng đăng nhập để lấy mã giảm giá');
+            return res.status(401).redirect('/'); // 401 for unauthorized access
+        }
+
+        const getIn4Voucher = await User.getTicket_Voucher(_id);
+        if (!getIn4Voucher) {
+            req.flash('error', 'Voucher không tồn tại');
+            return res.redirect('/shop');
+        }
+
+        const user = await User.in4User(user_Id);
+        if (!user.Voucher || !user.Voucher.some(ticket => ticket.Voucher_id === _id)) {
+            const voucherAdded = await User.addTicketVoucher(user_Id, _id, getIn4Voucher.Discount, getIn4Voucher.typeForProduct, getIn4Voucher.Expirationdate); // Assuming User.addTicketVoucher is the correct method
+            if (voucherAdded) {
+                req.flash('success', 'Lấy mã giảm giá thành công');
+            } else {
+                req.flash('error', 'Failed to add voucher');
+            }
+        } else {
+            req.flash('error', 'Bạn đã lấy Voucher này rồi');
+        }
+        res.redirect('/shop');
+    } catch (error) {
+        console.error('Error:', error);
+        req.flash('error', 'An error occurred while processing your request');
+        res.redirect('/shop');
+    }
+};
+const ListUsers = async(req, res) => {
+    try{
+        const listUser = await User.listUsers();
+       
+        res.render('listUser', {
+            listUser,
+
+        });
+    }catch(err){
+        console.log('Error:', err);
+    }
+}
+const getUserInChat = async (req, res) => {
+    try {
+        const user_Id = req.session.userData._id;
+        const UserName = req.session.userData.UserName;
+
+
+        if (!user_Id) {
+            req.flash('error', 'Vui lòng đăng nhập');
+            return res.status(401).redirect('/');
+        }
+        res.render('forum', {
+            user_Id,  // Truyền user_Id vào view
+            UserName
+        });
+    } catch (err) {
+        console.log('Error:', err);
+        req.flash('error', 'Có lỗi xảy ra');
+        return res.status(500).redirect('/');
+    }
+}
+
+const roomChat = async (req, res) => {
+    try {
+        const user_Id = req.session.userData._id;
+        const UserName = req.session.userData.UserName;
+        const { message } = req.body;
+
+        if (!user_Id) {
+            req.flash('error', 'Vui lòng đăng nhập để vào phòng chat');
+            return res.status(401).redirect('/'); // 401 for unauthorized access
+        }
+
+        const socket = req.app.get('socketio'); // Get the Socket.IO instance from the server
+        const roomChat = { user_Id, UserName, message };
+
+        // Phát tin nhắn đến một phòng chat cụ thể
+        socket.emit('chat forum', roomChat); // Emit 'chat forum' để gửi tin nhắn đến phòng chat chung
+
+
+        // Gửi sự kiện join
+        socket.emit('join', UserName);
+        socket.emit('leaverChat', UserName);
+        console.log('Gửi tin nhắn thành công');
+        res.status(200).send('Tin nhắn đã được gửi');
+    } catch (err) {
+        console.log('Error:', err);
+        req.flash('error', 'Lỗi khi gửi tin nhắn');
+        return res.status(500).redirect('/');
+    }
+};
+const chatBox = async (req, res) => {
+    try {
+        const { _id } = req.params;
+        const user_Id = req.session.userData._id;
+        const UserName = req.session.userData.UserName; 
+
+        if (!user_Id) {
+            console.log('User vui lòng đăng nhập');
+            req.flash('error', 'Vui lòng đăng nhập trước khi gửi tin nhắn');
+            return res.status(401).redirect('/');
+        }
+        const chatHistory = await User.chatBox(user_Id, _id);
+        if(!chatHistory){
+
+        }
+        res.render('chatBox', { user_Id, otherUserId: _id, UserName}); // Render the chat view with user IDs
+    } catch (err) {
+        console.log('Error:', err);
+        req.flash('error', 'Lỗi khi gửi tin nhắn');
+        return res.status(500).redirect('/');
+    }
+};
+const getFeedBack = async(req, res) => {
+    try{
+        const {_id} = req.params;
+        const user_Id = req.session.userData._id;
+        const UserName = req.session.userData.UserName; // Tên người gửi
+        if(!user_Id){
+            req.flash('error', 'Vui lòng đăng nhập');
+            return res.status(401).redirect('/');
+        }
+        const in4_Products = await theProduct.in4Product(_id);
+        res.render('feedBack', {
+            in4_Products,
+            _id,
+            user_Id,
+            UserName,
+        })
+        socket.emit('join', UserName);
+
+    }catch(err){
+        console.log('Error:', err);
+        req.flash('error', 'L��i khi lấy đánh giá');
+    }
+}
+const sendMessage = async (req, res) => {
+    try {
+        const { _id } = req.params; // ID của người nhận
+        const user_Id = req.session.userData._id; // ID của người gửi
+        const { message } = req.body; // Nội dung tin nhắn
+        const UserName = req.session.userData.UserName; // Tên người gửi
+
+        // Kiểm tra xem người dùng đã đăng nhập hay chưa
+        if (!user_Id) {
+            return res.status(401).json({ error: 'Vui lòng đăng nhập' });
+        }
+
+        // Tạo ID phòng chat từ ID của người gửi và người nhận
+        const roomId = [user_Id, _id].sort().join('-'); 
+
+
+        // Lấy đối tượng socket từ ứng dụng
+        const socket = req.app.get('socketio'); 
+        const chatMessage = { user_Id, message, roomId, UserName };
+
+        // Gửi tin nhắn đến phòng chat
+        socket.to(roomId).emit('sendMessage', chatMessage); 
+        res.status(200).json({ message: 'Tin nhắn đã được gửi' });
+
+    } catch (err) {
+        console.log('Error:', err);
+        return res.status(500).json({ error: 'Lỗi khi gửi tin nhắn' });
+    }
+};
+
 
 
 module.exports = {
@@ -415,4 +590,11 @@ module.exports = {
     getStore,
     folowStore,
     createrVouchers,
+    getTicketVoucher,
+    ListUsers,
+    getUserInChat,
+    roomChat,
+    sendMessage,
+    chatBox,
+    getFeedBack,
 };

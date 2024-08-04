@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +7,7 @@
     <link href="/css/navagativeBarmini.css" type="text/css" rel="stylesheet">
     <link href="/css/ShopPage.css" type="text/css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">  
+    <script src="../js/coppy.js"></script>
 </head>
 <body>
     <div class="container">
@@ -14,27 +15,57 @@
             <div class="banner-inner">
             </div>
         </section>
+        <div class="BestSales">
+            <form action="/BestSalesStore/<%=userId%>" method="get">
+                <button type="submit">Xem sản phẩm bán chạy nhất</button>
+            </form>
+        </div>
+        <div class="container">
+            <div class="Voucher">
+                <div class="voucher-item">
+                    <% if (voucher && voucher.length > 0) { %>
+                        <% voucher.forEach(voucher => { %>
+                            <div class="Voucher-item">
+                                <h3>Voucher</h3>
+                                <p><strong>Type:</strong> <%= voucher.typeForProduct %></p>
+                                <p><strong>Giảm giá:</strong> <%= voucher.Discount %>%</p>
+                                <p><strong>Số lượng:</strong> <%= voucher.useQuantity %></p>
+                                <p><strong>Kết thúc:</strong> <%= voucher.Expirationdate %></p>
+                                <form action="/getVoucher/<%=voucher._id%>" method="post">
+                                    <button type="submit">Lấy mã</button>
+                                </form>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p>Hiện tại không có Voucher nào</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        
+        
         <section class="products">
             <div class="product-list">       
-            <% if (getTheStore && getTheStore.length > 0) { %>
-                <% getTheStore.forEach(store => { %>
-                    <div class="product">
-                        <% if (store.image && store.image.data) { %>
-                            <img src="data:<%= store.image.contentType %>;base64,<%= store.image.data.toString('base64') %>" alt="<%= store.name %>">
-                        <% } else { %>
-                            <img src="/default-placeholder.jpg" alt="Default Image">
-                        <% } %>
-                        <h3><%= store.name %></h3>
-                        <p><%= store.price %> VND</p>
-                        <form action="/theProduct/<%= store._id %>" method="get">
-                            <button type="submit">Thông tin sản phẩm</button>
-                        </form>
-                    </div>
-                <% }); %>
-            <% } else { %>
-                <p>No warehouses found.</p>
-            <% } %>
-        </div>
-    </section>
+                <% if (getTheStore && getTheStore.length > 0) { %>
+                    <% getTheStore.forEach(store => { %>
+                        <div class="product">
+                            <% if (store.image && store.image.data) { %>
+                                <img src="data:<%= store.image.contentType %>;base64,<%= store.image.data.toString('base64') %>" alt="<%= store.name %>">
+                            <% } else { %>
+                                <img src="/default-placeholder.jpg" alt="Default Image">
+                            <% } %>
+                            <h3><%= store.name %></h3>
+                            <p><%= store.price %> VND</p>
+                            <form action="/theProduct/<%= store._id %>" method="get">
+                                <button type="submit">Thông tin sản phẩm</button>
+                            </form>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <p>Không tìm thấy kho hàng nào.</p>
+                <% } %>
+            </div>
+        </section>
+    </div>
 </body>
 </html>

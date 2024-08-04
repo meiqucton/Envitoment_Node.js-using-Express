@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tư vấn sản phẩm</title>
+    <link href="/css/feedBack.css" type="text/css" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="in4_Products">
+        <h1><%= in4_Products.name %></h1>
+        <img src="<%= in4_Products.image %>" alt="<%= in4_Products.name %>">
+        <p><strong>Giá: </strong><%= in4_Products.price %> VND</p>
+        <p><strong>Người bán: </strong><%= in4_Products.userName %></p>
+        <input id="messageInput" type="text" placeholder="Type a message..."/>
+        <button id="sendMessage">Send</button>
+    </div>
+
+    <div id="messages"></div>
+
+    <script>
+        const socket = io();
+        const client_Id = '<%= user_Id %>';
+        const Store_id = '<%= in4_Products.userId %>';
+        const nameProduct = '<%= in4_Products.userName %>';
+        const price = '<%= in4_Products.price %>';
+        const image = '<%= in4_Products.image %>';
+        const userName = '<%= UserName %>';
+        const roomId = [client_Id, Store_id].sort().join('-');
+
+        document.getElementById('sendMessage').addEventListener('click', () => {
+            const message = document.getElementById('messageInput').value;
+            socket.emit('startChat', {
+                user_Id: client_Id,
+                roomId,
+                nameProduct,
+                price,
+                image,
+                message,
+                userName,
+            });
+            document.getElementById('messageInput').value = '';
+        });
+        
+        //"startChat" là 1 hộp chứa nhiều đoạn chat đôi với nhau 
+        socket.on('startChat', (chatMessage) => {
+            const messageDiv = document.createElement('div');
+            messageDiv.innerHTML = `${chatMessage.userName}:<br>
+            <strong>MES :</strong>[${chatMessage.message}]`;
+            document.getElementById('messages').appendChild(messageDiv);
+        });
+    </script>
+</body>
+</html>

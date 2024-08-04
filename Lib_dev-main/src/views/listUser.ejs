@@ -1,0 +1,30 @@
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>List User</title>
+        <link rel="stylesheet" href="/css/listUser.css">
+    </head>
+    <body>
+        <div class="ListUser">
+            <div class="CardUser">
+         
+                <% if (listUser && listUser.length > 0) { %>
+                    <% listUser.forEach(user => { %>
+                        <div>
+                            <h3><%= user.UserName %></h3>
+                            <p><%= user.Email %></p>
+                            <button>Thêm bạn</button>
+                           <form action="/chat/<%= user._id %>">
+                            <button type="submit">Trò chuyện</button>
+                           </form>
+                        </div>
+                    <% }); %>
+                <% } else { %> 
+                    <h2>Hiện tại chưa có User nào</h2>
+                <% } %>
+            </div>
+        </div>
+
+    </body>
+    </html>

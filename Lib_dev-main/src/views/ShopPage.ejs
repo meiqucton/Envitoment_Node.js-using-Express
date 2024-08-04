@@ -45,8 +45,19 @@
                     <li><a href="/oderManagement"><i class="fa-solid fa-truck"></i></a></li>
                 </div>
 
+
                 </ul>
             </nav>
+            <form action="/search" method ="get">
+                <input type="text" name="search" placeholder="Search products...">
+                <button type="submit"><i class="fa-solid fa-search"></i></button>
+            </form>
+            <form action="/FlashDeal" method="get">
+                <button type="submit" class="flash-deal-button"><i class="fa-solid fa-flashlight"></i></button>
+            </form>
+            <form action="/BestSale" method="get">
+                <button type="submit" class="flash-deal-button"><i class="fa-solid fa-flashlight"></i> bestSell</button>
+            </form>
             <div class="suggest_price">
              <form id="priceFilterForm" action="/products" method="GET">
                 <label for="priceRange">Filter by price:</label>
@@ -97,6 +108,7 @@
                             <form action="/theProduct/<%= product._id %>" method="get">
                                 <button type="submit">Thông tin sản phẩm</button>
                             </form>
+                           
                         </div>
                     <% }); %>
                 </div>

@@ -1,0 +1,54 @@
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .ListUser {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        width: 100%;
+        max-width: 600px;
+    }
+    .CardUser {
+        padding: 20px;
+    }
+    .CardUser > div {
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .CardUser > div h3 {
+        margin: 0 0 10px;
+        color: #333;
+    }
+    .CardUser > div p {
+        margin: 0 0 10px;
+        color: #777;
+    }
+    .CardUser > div button {
+        background: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .CardUser > div button:hover {
+        background: #0056b3;
+    }
+    h2 {
+        text-align: center;
+        color: #666;
+    }

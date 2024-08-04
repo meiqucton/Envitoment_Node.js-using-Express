@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reddis</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        #messages {
+            list-style: none;
+            padding: 0;
+        }
+        #messages li {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        #message-form {
+            display: flex;
+            margin-top: 20px;
+        }
+        #message-form input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        #message-form button {
+            padding: 10px;
+            border: none;
+            background-color: #28a745;
+            color: #fff;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <form id="chat-form">
+            <ul id="messages"></ul>
+            <div id="message-form">
+                <input id="message" type="text" placeholder="Type a message..."/>
+                <button id="sendMessage">Send</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const socket = io();
+
+        // Lắng nghe sự kiện tin nhắn từ server
+        socket.on('chat forum', (data) => {
+            const item = document.createElement('li');
+            item.textContent = `${data.UserName}: ${data.message}`;
+            document.getElementById('messages').appendChild(item);
+        });
+
+        // Lắng nghe sự kiện thông báo từ server
+        socket.on('notification', (data) => {
+            const item = document.createElement('li');
+            item.textContent = data.message;
+            document.getElementById('messages').appendChild(item);
+        });
+
+        // Gửi tin nhắn khi người dùng nhập và gửi
+        document.getElementById('chat-form').addEventListener('submit', (e) => {
+            e.preventDefault(); // Ngăn chặn form submit
+            const message = document.getElementById('message').value;
+            const user_Id = '<%= user_Id %>'; // Lấy user_Id từ biến view
+            const UserName = '<%= UserName %>'; // Lấy UserName từ biến view
+
+            socket.emit('chat forum', { user_Id, UserName, message });
+            document.getElementById('message').value = ''; // Xóa nội dung ô nhập
+        });
+
+        // Thông báo người dùng tham gia phòng chat
+        socket.emit('join', '<%= UserName %>'); // Gửi sự kiện join với tên người dùng thực tế
+        // Thong bao ng dùng out khỏi phòng chat
+        socket.emit('leaverChat', '<%= UserName %>');
+    </script>
+</body>
+</html>

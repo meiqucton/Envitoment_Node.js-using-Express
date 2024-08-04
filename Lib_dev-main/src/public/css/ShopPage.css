@@ -251,3 +251,77 @@ footer p {
         width: calc(100% - 40px);
     }
 }
+
+/* Voucher Section */
+.Voucher {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(21%, 1fr)); /* Tạo lưới với số lượng cột tự động phù hợp */
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.Voucher-item {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.Voucher-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.Voucher-item h3 {
+    margin: 0;
+    color: #333;
+    font-size: 18px;
+}
+
+.Voucher-item p {
+    margin: 5px 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.Voucher-item p strong {
+    color: #555;
+}
+
+.Voucher-item button {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.Voucher-item button:hover {
+    background-color: #218838;
+}
+
+.Voucher-item button:active {
+    background-color: #1e7e34;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    .Voucher {
+        grid-template-columns: 1fr;
+    }
+
+    .Voucher-item {
+        width: 100%;
+        margin: 10px 0;
+    }
+}
