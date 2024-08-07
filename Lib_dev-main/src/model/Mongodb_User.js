@@ -117,7 +117,7 @@ const createrVoucher = async(Voucher) => {
         return false;
     }
 }
-
+//Voucher cho phần nhập
 const getVoucher = async(voucherCode) => {
     try{
         return await client.db(process.env.NAME_DATABASE).collection('Vocher').findOne({codeVoucher: voucherCode});
@@ -126,6 +126,7 @@ const getVoucher = async(voucherCode) => {
         return false;
     }
 }
+// Voucherc cho phần lấy 
 const getTicket_Voucher = async (_id) => {
     try {
         const voucher_Id = new ObjectId(_id);
@@ -145,8 +146,10 @@ const getVouCherCilent = async (user_Id) => {
         return false;
     }
 };
+
+
 //------
-const addTicketVoucher = async (userId, ticket_Voucher, discount, type, end) => {
+const addTicketVoucher = async (userId, ticket_Voucher, id_Store ,discount, type, end) => {
     try {
         const user_Id = new ObjectId(userId);
         const updatedUser = await client.db(process.env.NAME_DATABASE).collection('User').updateOne(
@@ -154,6 +157,7 @@ const addTicketVoucher = async (userId, ticket_Voucher, discount, type, end) => 
             $push: {
                 Voucher: {
                     Voucher_id: ticket_Voucher, 
+                    id_Store: id_Store,
                     type: type,
                     discount: discount,
                     dateEnd: end,

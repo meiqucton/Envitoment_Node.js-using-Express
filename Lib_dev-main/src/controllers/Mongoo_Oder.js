@@ -5,15 +5,13 @@ const confirmEmail = require('../config/Send_Mail');
 
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-
 const get_buy = async (req, res, next) => {
     const { _id } = req.params;
     
-
     if (req.session && req.session.userData) {
         const user_Id = req.session.userData._id;
         const address = req.session.userData.address;
-        const voucher = req.session.userData.Voucher;
+        const vouchers = req.session.userData.Voucher;
 
         try {
             if (!user_Id) {
@@ -25,7 +23,9 @@ const get_buy = async (req, res, next) => {
                 req.flash('error', 'Vui lòng cập nhật địa chỉ');
                 return res.redirect(`/Mg_product/${_id}`);
             }
+
             const product = await Mg_product.in4Product(_id);
+
             if (!product) {
                 return res.status(404).send("Sản phẩm không tồn tại");
             } else {
@@ -33,24 +33,33 @@ const get_buy = async (req, res, next) => {
                     req.flash('error', 'Sản phẩm đã hết hàng');
                     return res.redirect(`/Mg_product/${_id}`);
                 }
+
+                // Lấy Voucher_id từ vouchers
+                const voucherIds = vouchers.map(voucher => voucher.id_Store);
+                console.log('Voucher IDs:', voucherIds);
+
+                // lấy các voucher có trùng với store
+                const relevantVouchers = vouchers.filter(voucher => voucher.id_Store === product.userId);
+                console.log('Relevant Vouchers:', relevantVouchers);
+
                 res.render('buyProduct', {
                     _id: product._id,
                     name: product.name,
                     quanlity: product.quanlity,
                     type: product.type,
                     Address: address,
-                    Voucher: voucher,
+                    Voucher: relevantVouchers, // Chỉ hiển thị các voucher phù hợp
                 });
             }
-        } catch (err) {
-            console.log("Lỗi get_buy (Controller): ", err);
-            return res.status(500).redirect('/Error');
+        } catch (error) {
+            console.log('Error: ', error);
+            return res.status(500).send('Lỗi máy chủ');
         }
     } else {
-        console.log("Session hoặc userData không tồn tại");
-        res.status(401).send("Unauthorized");
+        res.status(400).send('Không có dữ liệu session');
     }
 };
+
 const buy_function = async (req, res) => {
     if (req.session && req.session.userData) {
         try {
@@ -75,6 +84,7 @@ const buy_function = async (req, res) => {
             }
 
             const type = product.type;
+            
 
             if (selecrtVoucher) { 
                

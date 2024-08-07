@@ -422,7 +422,7 @@ const getTicketVoucher = async (req, res) => {
 
         const user = await User.in4User(user_Id);
         if (!user.Voucher || !user.Voucher.some(ticket => ticket.Voucher_id === _id)) {
-            const voucherAdded = await User.addTicketVoucher(user_Id, _id, getIn4Voucher.Discount, getIn4Voucher.typeForProduct, getIn4Voucher.Expirationdate); // Assuming User.addTicketVoucher is the correct method
+            const voucherAdded = await User.addTicketVoucher(user_Id, _id, getIn4Voucher.user_Id ,getIn4Voucher.Discount, getIn4Voucher.typeForProduct, getIn4Voucher.Expirationdate); // Assuming User.addTicketVoucher is the correct method
             if (voucherAdded) {
                 req.flash('success', 'Lấy mã giảm giá thành công');
             } else {
