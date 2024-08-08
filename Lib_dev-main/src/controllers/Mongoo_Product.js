@@ -65,54 +65,54 @@ const AddProducts = async (req, res, next) => {
     }
 };
 
-const Find_type_PRODUCT = async (req, res) => {
-    try {
-        const type_product = req.query.type_product;
-        let getType;
-        switch (type_product) {
-            case 'shirt': 
-                getType = 'shirt';
-                break;
-            case 'coats': 
-                getType = 'coats';
-                break;
-            case 'pants': 
-                getType = 'pants';
-                break;
-            case 'hat':
-                getType = 'hat';
-                break;
-            case 'watch': 
-                getType = 'watch';
-                break;
-            case 'shoes': 
-                getType = 'shoes';
-                break;
-            case 'bag':
-                getType = 'bag';
-                break;
-            case 'outfit':
-                getType = 'outfit';
-                break;
-            case 'dress': 
-                getType = 'dress';
-                break;
-            default:
-                getType = 'all';
-                break;
-        }
-        const productList = await theProduct.findType(getType);
-        console.log('Product List:', productList);
+// const Find_type_PRODUCT = async (req, res) => {
+//     try {
+//         const type_product = req.query.type_product;
+//         let getType;
+//         switch (type_product) {
+//             case 'shirt': 
+//                 getType = 'shirt';
+//                 break;
+//             case 'coats': 
+//                 getType = 'coats';
+//                 break;
+//             case 'pants': 
+//                 getType = 'pants';
+//                 break;
+//             case 'hat':
+//                 getType = 'hat';
+//                 break;
+//             case 'watch': 
+//                 getType = 'watch';
+//                 break;
+//             case 'shoes': 
+//                 getType = 'shoes';
+//                 break;
+//             case 'bag':
+//                 getType = 'bag';
+//                 break;
+//             case 'outfit':
+//                 getType = 'outfit';
+//                 break;
+//             case 'dress': 
+//                 getType = 'dress';
+//                 break;
+//             default:
+//                 getType = 'all';
+//                 break;
+//         }
+//         const productList = await theProduct.findType(getType);
+//         console.log('Product List:', productList);
 
-        res.render('typeProduct', { 
-            productList: productList || [],
-            type_product: type_product,
-        });
-    } catch (err) {
-        console.log("Error in Find_type_PRODUCT(Controller): ", err);
-        return res.status(500).redirect('/Error');
-    }
-};
+//         res.render('typeProduct', { 
+//             productList: productList || [],
+//             type_product: type_product,
+//         });
+//     } catch (err) {
+//         console.log("Error in Find_type_PRODUCT(Controller): ", err);
+//         return res.status(500).redirect('/Error');
+//     }
+// };
 
 const in4_Products = async (req, res) => {
     try {
@@ -446,7 +446,7 @@ const findProduct = async(req, res) => {
 module.exports = {
     listProducts, 
     AddProducts,
-    Find_type_PRODUCT,
+    // Find_type_PRODUCT,
     in4_Products, 
     rateTheProduct, 
     getRate, 

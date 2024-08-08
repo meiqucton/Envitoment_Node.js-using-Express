@@ -109,10 +109,15 @@ const yourProduct = async(userId) => {
         throw new Error('Database Error');
     }
 }
-const get_suggested_price = async (minPrice, maxPrice) => {
+const findProduct = async (finalType ,minPrice, maxPrice) => {
     try{
     const db = client.db(process.env.NAME_DATABASE);    
-    return await db.collection("Products").find({price:{ $gte: minPrice, $lte: maxPrice }}).toArray();
+    
+        const query = {
+            type: finalType,
+            price: { $gte: minPrice, $lte: maxPrice }
+        };
+    return await db.collection("Products").find(query).toArray();
     }
     catch(err){
         console.log("L��i get_suggested_price(Controller): ", err);
@@ -125,6 +130,6 @@ module.exports = {
     buy_Product,
     getOderProduct,
     yourProduct,
-    get_suggested_price,
+    findProduct,
 };
 

@@ -24,15 +24,15 @@ const listProduct = async () => {
         return false;
     }
 };
-const findType = async(typeProduct) => {
-    try{
-        const db = client.db(process.env.NAME_DATABASE);
-        return await db.collection("Products").find({ type: typeProduct }).toArray();     
-    }catch(err){
-        console.error("Error in findType(model): ", err);
-        return false;
-    }
-}
+// const findType = async(typeProduct) => {
+//     try{
+//         const db = client.db(process.env.NAME_DATABASE);
+//         return await db.collection("Products").find({ type: typeProduct }).toArray();     
+//     }catch(err){
+//         console.error("Error in findType(model): ", err);
+//         return false;
+//     }
+// }
 const in4Product = async (Product_id) => {
     try {
         const db = client.db(process.env.NAME_DATABASE);
@@ -251,7 +251,7 @@ const findProduct = async(search) => {
 module.exports = {
     AddProduct,
     listProduct,
-    findType,
+    //findType,
     in4Product,
     rateProduct,
     wareHouse,

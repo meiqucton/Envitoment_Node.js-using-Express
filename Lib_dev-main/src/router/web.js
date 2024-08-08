@@ -5,7 +5,7 @@ const { requireLogin } = require('../controllers/authentication');
 const { OpenWeather } = require('../controllers/API_Controllers');
 const User = require('../controllers/Mongoo_User');
 const Product= require('../controllers/Mongoo_Product');
-const { buy_function, get_buy, confirmProduct ,functionGetOderProduct, your_Product, controller_suggested_price, getFeedBack, feedBack, sendMessage} = require('../controllers/Mongoo_Oder');
+const Oder = require('../controllers/Mongoo_Oder');
 const upload = require('../config/multerConfig');
 
 
@@ -45,25 +45,26 @@ router.post('/addProduct',upload.single('image') ,requireLogin, Product.AddProdu
 router.get('/theProduct/:_id', requireLogin, Product.in4_Products, );
 
 // Shop Routes
+router.get('/findProduct', Oder.findProduct);
 router.get('/search',Product.findProduct);
 router.get('/BestSalesStore/:userId', Product.Product_bestSell_byShop);
 router.get('/BestSale', Product.bestSlell);
 router.get('/FlashDeal', Product.flash_deals);
 router.post('/followStore/:userId', requireLogin, User.folowStore);
-router.get('/findType', Product.Find_type_PRODUCT);
-router.get('/products', controller_suggested_price);
+//router.get('/findType', Product.Find_type_PRODUCT);
+//router.get('/products', controller_suggested_price);
 router.post('/Responsice/:_id', requireLogin, Product.Responsice_Sales);
 router.get('/SaleProduct/:_id', requireLogin, Product.getSale);
 router.post('/SaleProduct/:_id', requireLogin, Product.Sale_Product);
-router.get('/oderManagement', requireLogin, your_Product);
-router.get('/oderManagement/:_id', requireLogin, functionGetOderProduct);
+router.get('/oderManagement', requireLogin, Oder.your_Product);
+router.get('/oderManagement/:_id', requireLogin, Oder.functionGetOderProduct);
 router.get('/wareHouses',Product.wareHouses );
 router.get('/yourStore', requireLogin, (req, res) => res.render('yourStore'));
 router.get('/Shop', requireLogin, Product.listProducts, );
 //Customer Routes
-router.get('/confirmPurchase/:token', requireLogin,confirmProduct);
-router.post('/buyProduct/:_id',requireLogin, buy_function);
-router.get('/Product/Buy/:_id',requireLogin, get_buy, );
+router.get('/confirmPurchase/:token', requireLogin, Oder.confirmProduct);
+router.post('/buyProduct/:_id',requireLogin,Oder.buy_function);
+router.get('/Product/Buy/:_id',requireLogin, Oder.get_buy, );
 // Product function 
 router.get('/updateProduct/:_id', requireLogin, Product.get_a_Product);
 router.get('/Product/Rate/:_id', requireLogin, Product.getRate);

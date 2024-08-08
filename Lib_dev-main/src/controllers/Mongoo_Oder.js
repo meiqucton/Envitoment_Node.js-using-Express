@@ -231,65 +231,131 @@ const your_Product = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
     }
-const controller_suggested_price = async (req, res) => {
-        try {
-            const priceRange = req.query.priceRange;
-            let min, max;
+// const controller_suggested_price = async (req, res) => {
+//         try {
+//             const type = req.query;
+//             const priceRange = req.query.priceRange;
+//             let min, max;
     
-            switch (priceRange) {
-                case 'low':
-                    min = 0;
-                    max = 100000;
-                    break;
-                case 'medium':
-                    min = 100000;
-                    max = 200000;
-                    break;
-                case 'high':
-                    min = 200000;
-                    max = 500000;
-                    break;
-                case 'highPlush':
-                    min = 500000;
-                    max = 1000000;
-                    break;
-                case 'highPromax':
-                    min = 1000000;
-                    max = 9999999999999;
-                    break;
-                default:
-                    min = 0;
-                    max = 9999999999999;
-                    break;
-            }
-            const minPrice =  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(min);
-            const maxPrice =  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(max); 
-            const products = await Mg_Oder.get_suggested_price(minPrice, maxPrice);
-            console.log('Min: ', minPrice);
-            console.log('Max: ', maxPrice);
-            if (!products) {
-                res.render('ProductByPrice', {
-                    products: [],
-                    priceRange: priceRange,
-                });
-            } else {
-                res.render('ProductByPrice', {
-                    products: products,
-                    priceRange: priceRange,
-                });
-            }
-        } catch (err) {
-            console.log("Error controller_suggested_price(Controller): ", err);
-            return res.status(500).redirect('/Error');
+//             switch (priceRange) {
+//                 case 'low':
+//                     min = 0;
+//                     max = 100000;
+//                     break;
+//                 case 'medium':
+//                     min = 100000;
+//                     max = 200000;
+//                     break;
+//                 case 'high':
+//                     min = 200000;
+//                     max = 500000;
+//                     break;
+//                 case 'highPlush':
+//                     min = 500000;
+//                     max = 1000000;
+//                     break;
+//                 case 'highPromax':
+//                     min = 1000000;
+//                     max = 9999999999999;
+//                     break;
+//                 default:
+//                     min = 0;
+//                     max = 9999999999999;
+//                     break;
+//             }
+//             const minPrice =  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(min);
+//             const maxPrice =  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(max); 
+//             const products = await Mg_Oder.get_suggested_price(type ,minPrice, maxPrice);
+//             console.log('Min: ', minPrice);
+//             console.log('Max: ', maxPrice);
+//             if (!products) {
+//                 res.render('ProductByPrice', {
+//                     products: [],
+//                     priceRange: priceRange,
+//                 });
+//             } else {
+//                 res.render('ProductByPrice', {
+//                     products: products,
+//                     priceRange: priceRange,
+//                 });
+//             }
+//         } catch (err) {
+//             console.log("Error controller_suggested_price(Controller): ", err);
+//             return res.status(500).redirect('/Error');
+//         }
+//     };
+const findProduct = async (req, res) => {
+    const typeRange = req.query.type;
+    const priceRange = req.query.priceRange;
+    let min, max;
+    let finalType;
+
+    try {
+        const optionTypes = ['shirt', 'coats', 'pants', 'hat', 'watch', 'shoes', 'bag', 'outfit', 'dress'];
+        if (optionTypes.includes(typeRange)) {
+            finalType = typeRange;
         }
-    };
-    
+
+        switch (priceRange) {
+            case 'low':
+                min = 0;
+                max = 100000;
+                break;
+            case 'medium':
+                min = 100000;
+                max = 200000;
+                break;
+            case 'high':
+                min = 200000;
+                max = 500000;
+                break;
+            case 'highPlush':
+                min = 500000;
+                max = 1000000;
+                break;
+            case 'highPromax':
+                min = 1000000;
+                max = 9999999999999;
+                break;
+            default:
+                min = 0;
+                max = 9999999999999;
+                break;
+        }
+
+
+        const minPrice =  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(min);
+        const maxPrice =  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(max); 
+        console.log('Min:', minPrice);
+        console.log('Max:', maxPrice);
+        console.log('getType:', finalType);
+        console.log('type:', typeRange);
+
+        const products = await Mg_Oder.findProduct(finalType, minPrice, maxPrice);
+            
+        if (!products) {
+            res.render('ProductByPrice', {
+                products: [],
+                priceRange: priceRange,
+            });
+        } else {
+            res.render('ProductByPrice', {
+                products: products,
+                priceRange: priceRange,
+            });
+        }
+    } catch (err) {
+        console.log("Error findProduct(Controller):", err);
+        return res.status(500).redirect('/Error');
+    }
+};
+
 module.exports = { 
     buy_function,
     get_buy, 
     functionGetOderProduct,
     your_Product, 
     confirmProduct,
-    controller_suggested_price,
+    findProduct,
     
     };

@@ -29,6 +29,17 @@
                                 <option value="dress">Dress</option>
                             </select>
                         </form>
+                        <form id="priceFilterForm" action="/products" method="GET">
+                            <label for="priceRange">Filter by price:</label>
+                            <select name="priceRange" id="priceRange" onchange="document.getElementById('priceFilterForm').submit()">
+                                <option value="all">All</option>
+                                <option value="low">0₫ - 100.000₫</option>
+                                <option value="medium">100.000₫ - 200.000₫</option>
+                                <option value="high">200.000₫ - 500.000₫</option>
+                                <option value="highPlush">500.000₫ - 1.000.000₫</option>
+                                <option value="highPromax"> 1.000.000₫</option>
+                            </select>
+                        </form>
                     </li>
                     <li><a href="/oderManagement"><i class="fa-solid fa-truck"></i></a></li>
                 </ul>

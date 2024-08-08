@@ -27,23 +27,30 @@
                 <ul>
                     <div class="header">
                     <li>
-                        <form id="product_Type_form"action="/findType" method="get">
-                            <label for="type_product">Loại sản phẩm:</label>  
-                            <select name="type_product" id="type_product" onchange="document.getElementById('product_Type_form').submit()">
-                                <option value="shirt">shirt</option>
-                                <option value="coat">coat</option>
-                                <option value="pants">pants</option>
-                                <option value="hat">hat</option>
-                                <option value="watch">watch</option>
-                                <option value="shoes">shoes</option>
-                                <option value="bag">bag</option>
-                                <option value="outfit">outfit</option>
-                                <option value="dress">dress</option>
+                        <form action="/findProduct" method="get">
+                            <select name="type" id="type">
+                                <option value="shirt">Shirt</option>
+                                <option value="coats">Coats</option>
+                                <option value="pants">Pants</option>
+                                <option value="hat">Hat</option>
+                                <option value="watch">Watch</option>
+                                <option value="shoes">Shoes</option>
+                                <option value="bag">Bag</option>
+                                <option value="outfit">Outfit</option>
+                                <option value="dress">Dress</option>
                             </select>
+                        
+                            <select name="priceRange" id="priceRange">
+                                <option value="all">All</option>
+                                <option value="low">0₫ - 100.000₫</option>
+                                <option value="medium">100.000₫ - 200.000₫</option>
+                                <option value="high">200.000₫ - 500.000₫</option>
+                                <option value="highPlush">500.000₫ - 1.000.000₫</option>
+                                <option value="highPromax">Trên 1.000.000₫</option>
+                            </select>
+                            <button type="submit"><i class="fa-solid fa-search"></i></button>
                         </form>
-                    </li>
-                    <li><a href="/oderManagement"><i class="fa-solid fa-truck"></i></a></li>
-                </div>
+                        
 
 
                 </ul>
@@ -59,17 +66,7 @@
                 <button type="submit" class="flash-deal-button"><i class="fa-solid fa-flashlight"></i> bestSell</button>
             </form>
             <div class="suggest_price">
-             <form id="priceFilterForm" action="/products" method="GET">
-                <label for="priceRange">Filter by price:</label>
-                <select name="priceRange" id="priceRange" onchange="document.getElementById('priceFilterForm').submit()">
-                    <option value="all">All</option>
-                    <option value="low">0₫ - 100.000₫</option>
-                    <option value="medium">100.000₫ - 200.000₫</option>
-                    <option value="high">200.000₫ - 500.000₫</option>
-                    <option value="highPlush">500.000₫ - 1.000.000₫</option>
-                    <option value="highPromax">> 1.000.000₫</option>
-                </select>
-            </form>
+       
 </form>
 
             </div>
