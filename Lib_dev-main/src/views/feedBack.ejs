@@ -20,36 +20,38 @@
     <div id="messages"></div>
 
     <script>
-        const socket = io();
-        const client_Id = '<%= user_Id %>';
-        const Store_id = '<%= in4_Products.userId %>';
-        const nameProduct = '<%= in4_Products.userName %>';
-        const price = '<%= in4_Products.price %>';
-        const image = '<%= in4_Products.image %>';
-        const userName = '<%= UserName %>';
-        const roomId = [client_Id, Store_id].sort().join('-');
+            const socket = io();
+            const client_Id = '<%= user_Id %>';
+            const Store_id = '<%= in4_Products.userId %>';
+            const nameProduct = '<%= in4_Products.userName %>';
+            const price = '<%= in4_Products.price %>';
+            const image = '<%= in4_Products.image %>';
+            const userName = '<%= UserName %>';
+            const roomId = [client_Id, Store_id].sort().join('-');
 
-        document.getElementById('sendMessage').addEventListener('click', () => {
-            const message = document.getElementById('messageInput').value;
-            socket.emit('startChat', {
-                user_Id: client_Id,
-                roomId,
-                nameProduct,
-                price,
-                image,
-                message,
-                userName,
+            // nhưng biến muốn đóng gói để send đi 
+            document.getElementById('sendMessage').addEventListener('click', () => {
+                const message = document.getElementById('messageInput').value;
+                socket.emit('startChat', {
+                    user_Id: client_Id,
+                    Store_id,
+                    roomId,
+                    nameProduct,
+                    price,
+                    image,
+                    message,
+                    userName,
+                });
+                document.getElementById('messageInput').value = '';
             });
-            document.getElementById('messageInput').value = '';
-        });
-        
-        //"startChat" là 1 hộp chứa nhiều đoạn chat đôi với nhau 
-        socket.on('startChat', (chatMessage) => {
-            const messageDiv = document.createElement('div');
-            messageDiv.innerHTML = `${chatMessage.userName}:<br>
-            <strong>MES :</strong>[${chatMessage.message}]`;
-            document.getElementById('messages').appendChild(messageDiv);
-        });
-    </script>
+            
+            //"startChat" là 1 hộp chứa nhiều đoạn chat đôi với nhau 
+            socket.on('startChat', (chatMessage) => {
+                const messageDiv = document.createElement('div');
+                messageDiv.innerHTML = `${chatMessage.userName}:<br>
+                <strong>MES :</strong>[${chatMessage.message}]`;
+                document.getElementById('messages').appendChild(messageDiv);
+            });
+        </script>
 </body>
 </html>

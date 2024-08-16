@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+        #supportRequests {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 400px;
+            overflow-y: scroll;
+        }
+        .request {
+            margin-bottom: 10px;
+        }
+        .request strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <h1>Manager Dashboard</h1>
+    <div id="supportRequests"></div>
+
+    <script>
+        const socket = io();
+
+        // Handle incoming support requests
+        socket.on('newSupportRequest', (supportData) => {
+            const requestDiv = document.createElement('div');
+            requestDiv.classList.add('request');
+            requestDiv.innerHTML = `
+                <strong>Product:</strong> ${supportData.nameProduct}<br>
+                <strong>Price:</strong> ${supportData.price} VND<br>
+                <strong>User:</strong> ${supportData.userName}<br>
+                <strong>Message:</strong> ${supportData.message}
+            `;
+            document.getElementById('supportRequests').appendChild(requestDiv);
+        });
+    </script>
+</body>
+</html>

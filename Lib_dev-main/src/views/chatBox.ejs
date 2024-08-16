@@ -29,40 +29,60 @@
 <body>
     <div id="chat">
         <div id="messages"></div>
-        <form id="messageForm" action="/sendMessage/<%= otherUserId %>" method="POST">
+        <form id="messageForm">
             <input id="messageInput" name="message" type="text" placeholder="Type your message here..." required>
             <button type="submit" id="sendMessage">Send</button>
         </form>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
-        const user_Id = '<%= user_Id %>';
-        const otherUserId = '<%= otherUserId %>';
-        const UserName = '<%= UserName %>';
-        const roomId = [user_Id, otherUserId].sort().join('-');
+        document.addEventListener('DOMContentLoaded', () => {
+            const socket = io();
+            const user_Id = '<%= user_Id %>';
+            const otherUserId = '<%= otherUserId %>';
+            const UserName = '<%= UserName %>';
+            const roomId = [user_Id, otherUserId].sort().join('-');
 
-        // Tham gia phòng chat khi trang được tải
-        socket.emit('join', roomId);
+            // xử lý để check id phòng phù hợp
+            socket.emit('join', roomId);
 
-        // Gửi tin nhắn khi biểu mẫu được gửi qua POST
-        document.getElementById('messageForm').addEventListener('submit', (e) => {
-            // Thực hiện hành động gửi biểu mẫu qua AJAX
-            e.preventDefault();
-            const message = document.getElementById('messageInput').value;
+            // hiện tin nhắn mới 
+            socket.on('sendMessage', (chatMessage) => {
+                if (chatMessage && chatMessage.UserName && chatMessage.message) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.textContent = `${chatMessage.UserName}: ${chatMessage.message}`;
+                    document.getElementById('messages').appendChild(messageDiv);
+                }
+            });
 
-            // Gửi tin nhắn qua Socket.io
-            socket.emit('sendMessage', { user_Id, roomId, message, UserName });
+            // tải lại đoạn chat cũ 
+            socket.on('loadMessages', (messages) => {
+                if (Array.isArray(messages)) {
+                    messages.forEach((chatMessage) => {
+                        if (chatMessage && chatMessage.UserName && chatMessage.message) {
+                            const messageDiv = document.createElement('div');
+                            messageDiv.textContent = `${chatMessage.UserName}: ${chatMessage.message}`;
+                            document.getElementById('messages').appendChild(messageDiv);
+                        }
+                    });
 
-            // Xóa nội dung ô nhập tin nhắn
-            document.getElementById('messageInput').value = '';
-        });
+                    // chức năng cuộn xuống để hiện tin nhăn mới nhất 
+                    const messagesDiv = document.getElementById('messages');
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                }
+            });
 
-        // Nhận tin nhắn từ Socket.io và hiển thị lên trang
-        socket.on('sendMessage', (chatMessage) => {
-            const messageDiv = document.createElement('div');
-            messageDiv.textContent = `${chatMessage.UserName}: ${chatMessage.message}`;
-            document.getElementById('messages').appendChild(messageDiv);
+            // chức năng nhận tin nhắn phía cilent 
+            document.getElementById('messageForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const message = document.getElementById('messageInput').value.trim();
+                if (message) {
+                    // Emit the message via Socket.io
+                    socket.emit('sendMessage', { user_Id, roomId, message, UserName });
+                    // xoá khoảng trắng 
+                    document.getElementById('messageInput').value = '';
+                }
+            });
         });
     </script>
 </body>

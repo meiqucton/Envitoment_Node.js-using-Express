@@ -217,6 +217,7 @@ const wareHouses = async (req, res) => {
         }
         
         res.render('wareHouses', { 
+            user_Id,
             warehouses: yourStores
         });
 

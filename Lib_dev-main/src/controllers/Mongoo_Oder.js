@@ -349,7 +349,23 @@ const findProduct = async (req, res) => {
         return res.status(500).redirect('/Error');
     }
 };
-
+const customer_Consulting = async (req, res) => {
+    try{
+        const id_user = req.session.userData._id;
+        if (!id_user) {
+            console.log("Error: User ID not found");
+            return res.status(400).send("User ID not found");
+        }
+        const getIn4 = await Mg_user.in4User(id_user);
+        res.render('Consulting', { 
+            getIn4,
+        });
+    }catch(err){
+        console.log("L��i trong customer_Consulting (Controller):", err);
+        req.flash('error', "L��i gặp phải khi thông tin tư vấn");
+        return res.redirect(`/Mg_product/${_id}`);
+    }
+}
 module.exports = { 
     buy_function,
     get_buy, 
@@ -357,5 +373,5 @@ module.exports = {
     your_Product, 
     confirmProduct,
     findProduct,
-    
+    customer_Consulting,
     };

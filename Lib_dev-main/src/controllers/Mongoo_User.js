@@ -506,15 +506,15 @@ const chatBox = async (req, res) => {
         const user_Id = req.session.userData._id;
         const UserName = req.session.userData.UserName; 
 
+        console.log('id người nhận', _id);
+        console.log('id nguoi gui ',user_Id );
+
         if (!user_Id) {
             console.log('User vui lòng đăng nhập');
             req.flash('error', 'Vui lòng đăng nhập trước khi gửi tin nhắn');
             return res.status(401).redirect('/');
         }
-        const chatHistory = await User.chatBox(user_Id, _id);
-        if(!chatHistory){
-
-        }
+    
         res.render('chatBox', { user_Id, otherUserId: _id, UserName}); // Render the chat view with user IDs
     } catch (err) {
         console.log('Error:', err);

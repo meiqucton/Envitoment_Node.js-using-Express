@@ -180,16 +180,6 @@ const listUsers = async() =>  {
     }
 }
 
-const chatBox = async(roomChat) =>  {
-    try {
-        await client.connect();
-        const room_Chat = await client.db(process.env.NAME_DATABASE).collection('dbChat').insertOne(roomChat);
-        return room_Chat.insertedId;
-    } catch (err) {
-        console.log("Error in insertChat:", err);
-        return false;
-    }
-}
 const updateChat = async(roomId, user_Id ,message) => {
     try{
         await client.connect();
@@ -228,6 +218,5 @@ module.exports = {
     addTicketVoucher,
     getTicket_Voucher,
     listUsers,
-    chatBox,
     updateChat,
  };

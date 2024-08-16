@@ -4,6 +4,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const ViewEnging = require('./controllers/viewEnging');
 const router = require('./router/web');
+const test_redis= require('./config/redis');
 const { TestMongoo, TestAPI } = require('./controllers/testConnect');
 
 const app = express();
@@ -13,7 +14,8 @@ ViewEnging(app);
 
 // Routes
 app.use(router);
-
+// redis
+test_redis.initRedis();
 // Database connection test
 TestMongoo();
 

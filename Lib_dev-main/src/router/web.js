@@ -33,6 +33,7 @@ router.get('/Profile', requireLogin, User.profileUser);
 router.post('/updateAddress/:_id', requireLogin, User.Address)
 
 // Weather Route
+router.get('/Consulting/:user_Id', Oder.customer_Consulting); 
 router.get('/chat/:_id', User.chatBox);
 router.post('/sendMessage/:otherUserId', User.sendMessage);
 router.get('/Chat', User.getUserInChat);
@@ -45,6 +46,7 @@ router.post('/addProduct',upload.single('image') ,requireLogin, Product.AddProdu
 router.get('/theProduct/:_id', requireLogin, Product.in4_Products, );
 
 // Shop Routes
+
 router.get('/findProduct', Oder.findProduct);
 router.get('/search',Product.findProduct);
 router.get('/BestSalesStore/:userId', Product.Product_bestSell_byShop);
