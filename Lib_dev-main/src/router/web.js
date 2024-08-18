@@ -35,7 +35,6 @@ router.post('/updateAddress/:_id', requireLogin, User.Address)
 // Weather Route
 router.get('/Consulting/:user_Id', Oder.customer_Consulting); 
 router.get('/chat/:_id', User.chatBox);
-router.post('/sendMessage/:otherUserId', User.sendMessage);
 router.get('/Chat', User.getUserInChat);
 router.get('/pageWeather', requireLogin, (req, res) => res.render('weatherView'));
 router.post('/Weather', requireLogin, OpenWeather);
@@ -62,6 +61,7 @@ router.get('/oderManagement', requireLogin, Oder.your_Product);
 router.get('/oderManagement/:_id', requireLogin, Oder.functionGetOderProduct);
 router.get('/wareHouses',Product.wareHouses );
 router.get('/yourStore', requireLogin, (req, res) => res.render('yourStore'));
+router.get('/consulting', requireLogin, User.consulting);
 router.get('/Shop', requireLogin, Product.listProducts, );
 //Customer Routes
 router.get('/confirmPurchase/:token', requireLogin, Oder.confirmProduct);
@@ -75,6 +75,8 @@ router.post('/deleteProduct/:_id', requireLogin,Product.Del_products);
 router.post('/updateProduct/:_id', requireLogin, Product.Update_products);
 
 router.get('/feedback/:_id',requireLogin, User.getFeedBack);
+router.get('/consultant/:user_Id', requireLogin, User.consulting_Interface);
+    
 
 // Route để gửi phản hồi sản phẩm (dành cho lần đầu tiên)
 // router.post('/feedback/:_id', requireLogin, feedBack);

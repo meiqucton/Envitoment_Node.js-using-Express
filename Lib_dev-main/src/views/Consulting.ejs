@@ -3,47 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manager Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 0;
-        }
-        #supportRequests {
-            border: 1px solid #ccc;
-            padding: 10px;
-            height: 400px;
-            overflow-y: scroll;
-        }
-        .request {
-            margin-bottom: 10px;
-        }
-        .request strong {
-            display: block;
-            margin-bottom: 5px;
-        }
-    </style>
+    <title>Tư vấn</title>
+    <!-- Thêm thư viện Socket.IO -->
+    <link href="/css/consulting.css" type="text/css" rel="stylesheet">
+
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-    <h1>Manager Dashboard</h1>
-    <div id="supportRequests"></div>
+    <h1>SHOP: <%= getIn4Store.UserName %></h1>
+    <p>Tư vấn</p>
+
+    <!-- Div để chứa các tin nhắn -->
+    <div id="messages" style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto;">
+    </div>
 
     <script>
         const socket = io();
+        const Store_id = '<%= getIn4Store._id %>';
+        socket.emit('join_consultingroom', Store_id);
 
-        // Handle incoming support requests
-        socket.on('newSupportRequest', (supportData) => {
-            const requestDiv = document.createElement('div');
-            requestDiv.classList.add('request');
-            requestDiv.innerHTML = `
-                <strong>Product:</strong> ${supportData.nameProduct}<br>
-                <strong>Price:</strong> ${supportData.price} VND<br>
-                <strong>User:</strong> ${supportData.userName}<br>
-                <strong>Message:</strong> ${supportData.message}
-            `;
-            document.getElementById('supportRequests').appendChild(requestDiv);
+        socket.on('loadRequest', (filteredMessages) => {
+            if (Array.isArray(filteredMessages)) {
+                filteredMessages.forEach((chatMessage) => {
+                    if (chatMessage && chatMessage.userName && chatMessage.nameProduct && chatMessage.user_Id) {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.innerHTML = `
+                            <strong>NameUser:</strong> ${chatMessage.userName} 
+                            <label><strong>Product:</strong> ${chatMessage.nameProduct}</label>
+                            <form action='/consultant/${chatMessage.user_Id}' method='get'> 
+                                <button type="submit"><i class="fa-solid fa-message"></i></button>
+                            </form>
+                        `;
+                        document.getElementById('messages').appendChild(messageDiv);
+                    }
+                });
+
+                // Chức năng cuộn xuống để hiện tin nhắn mới nhất
+                const messagesDiv = document.getElementById('messages');
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
         });
     </script>
 </body>

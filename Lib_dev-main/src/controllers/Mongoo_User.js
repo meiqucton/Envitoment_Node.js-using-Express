@@ -538,43 +538,53 @@ const getFeedBack = async(req, res) => {
             user_Id,
             UserName,
         })
-        socket.emit('join', UserName);
+
 
     }catch(err){
-        console.log('Error:', err);
-        req.flash('error', 'L��i khi lấy đánh giá');
-    }
+        console.log('Lỗi feedBack: ', err)
+    }   
 }
-const sendMessage = async (req, res) => {
-    try {
-        const { _id } = req.params; // ID của người nhận
+const consulting = async (req, res) => {
+    try{
         const user_Id = req.session.userData._id; // ID của người gửi
-        const { message } = req.body; // Nội dung tin nhắn
-        const UserName = req.session.userData.UserName; // Tên người gửi
-
-        // Kiểm tra xem người dùng đã đăng nhập hay chưa
-        if (!user_Id) {
-            return res.status(401).json({ error: 'Vui lòng đăng nhập' });
+        const getIn4Store = await User.in4User(user_Id);
+        
+        if(!getIn4Store){
+            console.log('Lỗi lấy thông tin cửa hàng');
+            return res.status(401).redirect('/');
+        }else{
+            res.render('consulting', {
+                getIn4Store
+            });
         }
 
-        // Tạo ID phòng chat từ ID của người gửi và người nhận
-        const roomId = [user_Id, _id].sort().join('-'); 
-
-
-        // Lấy đối tượng socket từ ứng dụng
-        const socket = req.app.get('socketio'); 
-        const chatMessage = { user_Id, message, roomId, UserName };
-
-        // Gửi tin nhắn đến phòng chat
-        socket.to(roomId).emit('sendMessage', chatMessage); 
-        res.status(200).json({ message: 'Tin nhắn đã được gửi' });
-
-    } catch (err) {
-        console.log('Error:', err);
-        return res.status(500).json({ error: 'Lỗi khi gửi tin nhắn' });
+    }catch(err){
+        console.log('Error lỗi tư vấn sản phẩm :', err);
     }
-};
+}
 
+const consulting_Interface = async(req, res) => {
+    try{
+        const { user_Id } = req.params;
+        const Store_Id = req.session.userData._id;
+        const getIn4Customer = await User.in4User(user_Id);
+        const getIn4Store = await User.in4User(Store_Id);
+        if(!getIn4Customer ||!getIn4Store){
+            console.log('L��i lấy thông tin người dùng');
+            return res.status(401).redirect('/');            
+        }
+        res.render('consulting_interface', {
+            getIn4Customer,
+            getIn4Store,
+            user_Id,
+        });
+
+
+    }catch(err){
+        console.log('Lỗi phần lấy thông consulting_Interface');
+        console.log(err);
+    }
+}
 
 
 module.exports = {
@@ -594,7 +604,8 @@ module.exports = {
     ListUsers,
     getUserInChat,
     roomChat,
-    sendMessage,
     chatBox,
     getFeedBack,
+    consulting,
+    consulting_Interface,
 };

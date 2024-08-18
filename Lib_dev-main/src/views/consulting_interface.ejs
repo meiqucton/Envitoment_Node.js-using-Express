@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tư vấn sản phẩm</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        /* CSS to improve the UI */
+        #messages {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .message strong {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <input type="text" id="messageInput" placeholder="Type your message here">
+        <button id="FeedBackInformation">Send</button>
+    </div>
+    <div id="messages"></div>
+
+    <script>
+        const socket = io();
+        const client_Id = '<%= user_Id %>';
+        const Store_id = '<%= getIn4Store._id %>';
+
+        const roomId = [client_Id, Store_id].sort().join('-');
+        socket.emit('joinFeedBack', roomId);
+
+        document.getElementById('FeedBackInformation').addEventListener('click', () => {
+            const message = document.getElementById('messageInput').value;
+            if (message.trim()) {
+                socket.emit('FeedBackInformation', {
+                    user_Id: client_Id,
+                    roomId,
+                    message,
+                    userName: '<%= getIn4Store.UserName %>',
+                });
+                document.getElementById('messageInput').value = '';
+            }
+        });
+
+        socket.on('FeedBackInformation', (chatMessage) => {
+            if (chatMessage && chatMessage.userName  && chatMessage.message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.innerHTML = `<strong>${chatMessage.userName}:</strong>  ${chatMessage.message}`;
+                document.getElementById('messages').appendChild(messageDiv);
+            }
+        });
+
+        socket.on('loadMessageFeedBack', (messages) => {
+            if (Array.isArray(messages)) {
+                messages.forEach((chatMessage) => {
+                    if (chatMessage && chatMessage.userName && chatMessage.nameProduct && chatMessage.price && chatMessage.message || chatMessage && chatMessage.userName  && chatMessage.message) {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.classList.add('message');
+                        messageDiv.innerHTML = `<strong>${chatMessage.userName}:</strong> ${chatMessage.nameProduct}: ${chatMessage.message}`;
+                        document.getElementById('messages').appendChild(messageDiv);
+                    }
+                });
+
+                // Scroll to the bottom to show the latest message
+                const messagesDiv = document.getElementById('messages');
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        });
+    </script>
+</body>
+</html>

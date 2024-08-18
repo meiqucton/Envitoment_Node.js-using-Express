@@ -33,11 +33,12 @@ const ViewEngine = (app) => {
     const socketIo = require('socket.io');
     const server = http.createServer(app);
     const io = socketIo(server);
-    
+    let listRequest = [];
    // Lắng nghe sự kiện kết nối
    io.on('connection', (socket) => {
     console.log('Socket connected:', socket.id);
 
+    
     // check phòng và khỏi taọ hiển thị lại tin nhắn cũ 
     socket.on('join', async (roomId) => {
         try {
@@ -86,11 +87,89 @@ const ViewEngine = (app) => {
     });
 
     // socket cho phần tư vấn sản phẩm 
-    socket.on('startChat', ({ roomId, user_Id, nameProduct, price, imageProduct, message, userName }) => {
-        socket.join(roomId);
-        io.to(roomId).emit('startChat', { user_Id, nameProduct, price, imageProduct, message, userName });
-    });
 
+    socket.on('FeedBackInformation', async ({ user_Id, roomId, Store_id, nameProduct, price, message, userName,}) => {
+        try {
+            // gửi tin nhắn trục tiếp đến với khách hàng 
+
+            io.to(roomId).emit('FeedBackInformation', { user_Id, roomId, Store_id, nameProduct, price, message, userName });
+            
+
+            const redisClient = await redisConfig.getRedis();
+            if (!redisClient) {
+                console.error('Cannot connect to Redis');
+                return;
+            }
+            
+            const messageToStore = JSON.stringify({ user_Id, roomId, Store_id, nameProduct, price, message, userName });
+            const request = JSON.stringify({user_Id, roomId,Store_id ,nameProduct, price, userName })
+            await redisClient.rPush('requestCilent', request);
+            await redisClient.rPush('product_consulting', messageToStore);
+            console.log('Gửi thông tin hỗ trợ thành công');
+            
+        } catch (err) {
+            console.error('Lỗi ở phần product consulting(viewEnginn)', err);
+        }
+    });
+        socket.on('joinFeedBack', async (roomId) => {
+            try {
+                const redisClient = await redisConfig.getRedis();
+                if (!redisClient) {
+                    console.error('Cannot connect to Redis');
+                    return;
+                }
+            
+                console.log('Bạn đã vào joinFeedBack');
+                const messages = await redisClient.lRange('product_consulting', 0, -1);
+                const parsedMessages = messages
+                    .map(mgs => JSON.parse(mgs))
+                    .filter(msg => msg.roomId === roomId);
+                    console.log('roomId',roomId);
+                    console.log('loadMessageFeedBack: ', parsedMessages);
+
+                socket.emit('loadMessageFeedBack', parsedMessages);
+            
+                socket.join(roomId);
+                
+            } catch (error) {
+                console.error('Error handling join event:', error);
+            }
+        });
+    // (phòng tiếp nhận tư vấn)
+    socket.on('join_consultingroom', async (Store_id) => {
+        try {
+            const redisClient = await redisConfig.getRedis();
+            if (!redisClient) {
+                console.error('Cannot connect to Redis');
+                return;
+            }
+            console.log('Bạn đã vào join_consultingroom');
+            const getRequest = await redisClient.lRange('requestCilent', 0, -1);
+            const parsedMessages = getRequest.map(msg => JSON.parse(msg));
+            
+            // Sử dụng Map để lọc các yêu cầu trùng lặp dựa trên user_Id
+            const uniqueMessages = new Map();
+    
+            parsedMessages.forEach(msg => {
+                if (msg.Store_id === Store_id && !uniqueMessages.has(msg.user_Id)) {
+                    uniqueMessages.set(msg.user_Id, msg);
+                }
+            });
+    
+            // Chuyển Map thành mảng các yêu cầu duy nhất
+            const filteredMessages = Array.from(uniqueMessages.values());
+    
+            console.log('TgetRequest: ', getRequest);
+            console.log('Thông tin request: ', filteredMessages);
+            socket.emit('loadRequest', filteredMessages);
+            socket.join(Store_id);
+            
+        } catch (error) {
+            console.error('Lỗi ở phần consulting reception room (viewEngine)', error);
+        }
+    });
+    
+    
     // chat tin nhắn cho phần cộng đồng
     socket.on('chat forum', (msg) => {
         io.emit('chat forum', msg);
