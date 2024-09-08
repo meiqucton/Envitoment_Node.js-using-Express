@@ -46,8 +46,10 @@ const { ObjectId } = require('mongodb');
 //     }
 // };
 //============= VOUCHER GET =============================
-const buy_Product = async (Product_id, id_user, name_user, product_name,type,size, theQuanlity, Address, voucherCode) => {
+const buy_Product = async (Product_id, id_user, name_user, product_name,type,size, theQuanlity, Address, voucherCode, paymen_method) => {
     try {
+        const firt_total_amount = 0;
+        let paymen_Method;
         const db = client.db(process.env.NAME_DATABASE);
         const productId = new ObjectId(Product_id);
 
@@ -60,15 +62,23 @@ const buy_Product = async (Product_id, id_user, name_user, product_name,type,siz
         if (product.quanlity < theQuanlity) {
             return res.status(400).json({ error: 'Số lượng sản phẩm không đủ' });
         }
+
+        if(paymen_method === 'cod'){
+            paymen_Method = 'thanh toán khi nhận hàng';
+            firt_total_amount = ((product_price_origin - (product_price_origin / 100 *  ChangeVoucher)) * theQuanlity * 1000) ;
+        }
+        if(paymen_method === 'paypal'){
+            paymen_Method = 'đã thanh toán sản phẩm';
+        }
         const product_price_origin = parseFloat(product.price);
         const ChangeVoucher = parseInt(voucherCode);
         console.log('ChangeVoucher', ChangeVoucher);
-        const firt_total_amount = ((product_price_origin - (product_price_origin / 100 *  ChangeVoucher)) * theQuanlity * 1000) ;
         console.log("Gia sau khi giam la: ", firt_total_amount);
         const total_amount =  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(firt_total_amount); 
         const newQuality = product.quanlity - theQuanlity;
         await db.collection("Products").updateOne({ _id: productId }, { $set: { quanlity: newQuality } });
-
+        
+        
         const newOrder = await db.collection("yourOrder").insertOne({
             Product_id: productId,
             id_user,
@@ -79,6 +89,7 @@ const buy_Product = async (Product_id, id_user, name_user, product_name,type,siz
             quanlity: theQuanlity,
             Address,
             total_amount, 
+            paymen_method: paymen_Method,
             orderDate: new Date()
         });
 

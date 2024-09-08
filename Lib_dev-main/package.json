@@ -36,11 +36,13 @@
     "otp-generator": "^4.0.1",
     "params": "^0.1.1",
     "path": "^0.12.7",
+    "paypal-rest-sdk": "^1.8.1",
     "pg": "^8.11.5",
     "pg-hstore": "^2.3.4",
     "redis": "^4.7.0",
     "save": "^2.9.0",
     "sequelize": "^6.37.3",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "stripe": "^16.9.0"
   }
 }

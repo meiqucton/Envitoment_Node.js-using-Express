@@ -68,7 +68,6 @@ const ViewEngine = (app) => {
         io.to(roomId).emit('notification', { message: `User ${socket.id} has left the room` });
     });
 
-
     // Gửi tin nhắn 1-1
     socket.on('sendMessage', async ({ user_Id, roomId, message, UserName }) => {
         try {
@@ -86,6 +85,8 @@ const ViewEngine = (app) => {
         }
     });
 
+
+    
     // socket cho phần tư vấn sản phẩm 
 
     socket.on('FeedBackInformation', async ({ user_Id, roomId, Store_id, nameProduct, price, message, userName,}) => {
@@ -135,7 +136,9 @@ const ViewEngine = (app) => {
                 console.error('Error handling join event:', error);
             }
         });
+     
     // (phòng tiếp nhận tư vấn)
+ 
     socket.on('join_consultingroom', async (Store_id) => {
         try {
             const redisClient = await redisConfig.getRedis();

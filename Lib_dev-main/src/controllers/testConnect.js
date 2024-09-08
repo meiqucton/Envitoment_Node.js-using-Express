@@ -1,5 +1,5 @@
 const client = require('../config/Mongoo_DB');
-
+const PayPal = require('../config/Paypal(bank)');
 
     const TestMongoo = async(req,res) =>{
         try{
@@ -11,6 +11,5 @@ const client = require('../config/Mongoo_DB');
             console.log("Lỗi kết nối  Mongoodb", err);
         }
     }
- 
 
-module.exports ={ TestMongoo} ;
+module.exports ={ TestMongoo } ;

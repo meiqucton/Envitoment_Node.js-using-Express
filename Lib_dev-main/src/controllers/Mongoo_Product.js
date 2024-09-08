@@ -23,8 +23,8 @@ const AddProducts = async (req, res, next) => {
             req.flash('error', 'Giá sản phẩm phải lớn hơn 0');
             return res.redirect('/addProduct');
         }
-        const price = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(thePrice);
-
+        // const price = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(thePrice);
+        const price = thePrice;
         // Đọc file ảnh và chuyển đổi sang dạng Buffer
         const imageData = fs.readFileSync(image.path);
 

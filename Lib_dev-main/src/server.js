@@ -4,8 +4,8 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const ViewEnging = require('./controllers/viewEnging');
 const router = require('./router/web');
-const test_redis= require('./config/redis');
-const { TestMongoo, TestAPI } = require('./controllers/testConnect');
+const test_redis = require('./config/redis');
+const { TestMongoo } = require('./controllers/testConnect');
 
 const app = express();
 
@@ -18,7 +18,6 @@ app.use(router);
 test_redis.initRedis();
 // Database connection test
 TestMongoo();
-
 // Start server
 const port = process.env.PORT || 4212;
 const hostname = process.env.HOST_NAME;
